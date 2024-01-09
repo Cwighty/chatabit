@@ -17,4 +17,6 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       - name: Format
-        run: dotnet format --verify-no-changes --verbosity diagnostic
+        run: | 
+          cd app/
+          dotnet format --verify-no-changes --verbosity diagnostic
