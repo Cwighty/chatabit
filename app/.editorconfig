@@ -37,6 +37,8 @@ csharp_style_prefer_local_over_anonymous_function = true:suggestion
 csharp_style_prefer_index_operator = true:suggestion
 csharp_style_prefer_range_operator = true:suggestion
 dotnet_diagnostic.SA0001.severity = none
+csharp_style_allow_embedded_statements_on_same_line_experimental = true:silent
+dotnet_diagnostic.SA1601.severity = none
 [*.{cs,vb}]
 #### Naming styles ####
 
