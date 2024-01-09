@@ -34,7 +34,7 @@ services:
       - URL=chat.duckdns.org
       - VALIDATION=duckdns
       - DUCKDNSTOKEN=${DUCKDNSTOKEN}
-      - STAGING=false
+      - STAGING=true
     volumes:
       - /home/caleb/data/swag:/config
       - ./swag-default.conf:/config/nginx/site-confs/default.conf
