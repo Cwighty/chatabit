@@ -14,9 +14,8 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.0.x
-      - name: Restore dependencies
-        run: dotnet restore
       - name: Format
-        run: | 
+        run: |
           cd app/
+          dotnet restore
           dotnet format --verify-no-changes --verbosity diagnostic
