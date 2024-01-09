@@ -5,7 +5,7 @@
 
 
 ```bash
-dotnet ef dbcontext scaffold "Host=chat-db;Port=5432;Database=chat;Username=admin;Password=chatpassword!" Npgsql.EntityFrameworkCore.PostgreSQL --project ./chat.data/ -c ChatDbContext --context-dir ./ -o Entities -f --no-onconfiguring
+dotnet ef dbcontext scaffold "Host=chatdb;Port=5432;Database=chatdb;Username=admin;Password=chatpassword!" Npgsql.EntityFrameworkCore.PostgreSQL --project ./chat.data/ -c ChatDbContext --context-dir ./ -o Entities -f --no-onconfiguring
 ```
 - Note: This is to be run from within the development container, the connection string is set up to work with the docker-compose networK
 

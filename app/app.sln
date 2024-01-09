@@ -3,25 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chat", "chat\chat.csproj", "{2679619A-9165-447B-A3C6-58017896242A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "chat.tests", "chat.tests\chat.tests.csproj", "{B5063A81-C940-4786-8FF6-D008A93FA0B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chat.tests", "chat.tests\chat.tests.csproj", "{B5063A81-C940-4786-8FF6-D008A93FA0B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "chat.data", "chat.data\chat.data.csproj", "{4F597F77-F75A-4393-8C4E-F0A94617F6F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chat.data", "chat.data\chat.data.csproj", "{4F597F77-F75A-4393-8C4E-F0A94617F6F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "chat", "chat\chat.csproj", "{2FD89BE8-58B7-4E95-8173-21B91BEC2C3E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "chat.Client", "chat.Client\chat.Client.csproj", "{E4526510-9133-4EB8-86CF-19D0309E22E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2679619A-9165-447B-A3C6-58017896242A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2679619A-9165-447B-A3C6-58017896242A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2679619A-9165-447B-A3C6-58017896242A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2679619A-9165-447B-A3C6-58017896242A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B5063A81-C940-4786-8FF6-D008A93FA0B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B5063A81-C940-4786-8FF6-D008A93FA0B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5063A81-C940-4786-8FF6-D008A93FA0B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -30,5 +25,19 @@ Global
 		{4F597F77-F75A-4393-8C4E-F0A94617F6F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F597F77-F75A-4393-8C4E-F0A94617F6F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F597F77-F75A-4393-8C4E-F0A94617F6F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FD89BE8-58B7-4E95-8173-21B91BEC2C3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FD89BE8-58B7-4E95-8173-21B91BEC2C3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FD89BE8-58B7-4E95-8173-21B91BEC2C3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FD89BE8-58B7-4E95-8173-21B91BEC2C3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4526510-9133-4EB8-86CF-19D0309E22E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4526510-9133-4EB8-86CF-19D0309E22E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4526510-9133-4EB8-86CF-19D0309E22E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4526510-9133-4EB8-86CF-19D0309E22E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9E611194-E538-42EB-9C46-794DE0F69BC0}
 	EndGlobalSection
 EndGlobal

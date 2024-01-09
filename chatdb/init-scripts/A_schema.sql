@@ -6,8 +6,8 @@ create table person (
     name text not null
 );
 
-create table message (
+create table chat_message (
     id serial primary key,
-    message text not null,
+    message_text text not null,
     created_at timestamp not null default now()
 );
