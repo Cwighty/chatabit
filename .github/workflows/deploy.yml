@@ -12,7 +12,11 @@ on:
   workflow_dispatch:
 
 jobs:
+  format:
+    uses: ./.github/workflows/format.yml
+
   unit-tests:
+    needs: format
     uses: ./.github/workflows/test.yml
 
   deploy-application:
