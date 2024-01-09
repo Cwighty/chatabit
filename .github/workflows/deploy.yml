@@ -1,0 +1,30 @@
+name: Deploy To Production
+
+env:
+  DUCKDNSTOKEN: ${{ secrets.DUCKDNSTOKEN }}
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    uses: ./.github/workflows/test.yml
+
+  deploy-application:
+    needs: unit-tests
+    runs-on: [self-hosted]
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+
+      - name: redeploy application
+        run: |
+          cd ops
+          docker compose pull
+          docker compose build
+          docker compose up -d

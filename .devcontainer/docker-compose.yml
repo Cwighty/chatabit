@@ -1,0 +1,54 @@
+version: "3.9"
+services:
+  editor:
+    build: .
+    user: developer
+    container_name: chat-editor
+    environment:
+      # This is needed to connect to the host's docker daemon for dotnet testcontainers
+      - TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal
+    volumes:
+      - developer_home:/home/developer
+      - ../:/app
+      - ./.bashrc:/home/developer/.bashrc
+      - $HOME/.ssh:/home/developer/.ssh
+      # To connect to the host's docker daemon
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /app
+    command: tail -f /dev/null
+
+  chat:
+    container_name: chat
+    build:
+      context: .
+    user: developer
+    volumes:
+      - ../:/app/
+    working_dir: /app
+    environment:
+      - DOTNET_URLS=http://+:5000 # by default Dotnet only listens to requests coming from 'localhost' from within the container, adding this will listen outside
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=nutrinovadb;Username=admin;Password=Pleasegivemecoke!
+    command: >
+      sh -c "
+        cd app/chat
+        dotnet watch run --non-interactive --no-hot-reload
+        "
+    ports:
+      - "5000:5000"
+
+  postgres:
+    image: postgres:latest
+    container_name: chatdb
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: chatdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: chatpassword!
+    volumes:
+      - chat_db_data:/var/lib/postgresql/data
+      - ../chatdb/init-scripts:/docker-entrypoint-initdb.d
+
+volumes:
+  developer_home:
+  chat_db_data:
