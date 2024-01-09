@@ -31,7 +31,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Denver
-      - URL=chat.duckdns.org
+      - URL=chatabit.duckdns.org
       - VALIDATION=duckdns
       - DUCKDNSTOKEN=${DUCKDNSTOKEN}
       - STAGING=true
