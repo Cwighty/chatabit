@@ -1,0 +1,39 @@
+@page "/Chat"
+@using global::Chat.Data.Entities
+@inject HttpClient HttpClient
+<h3>Chat</h3>
+
+<InputText @bind="username"/>
+
+<div>
+    @foreach (var m in Messages)
+    {
+        <p>@m.Message1</p>
+    }
+</div>
+
+<div class="form-group">
+    <label for="message">Message</label>
+    <InputText @bind="message" class="form-control"/>
+    <button @onclick="SendMessage"></button>
+</div>
+
+@code {
+    private string message = "";
+    private string username = "";
+    private List<Message> Messages { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        Messages = await HttpClient.GetFromJsonAsync<List<Message>>("/chat/messages");
+    }
+
+    private readonly List<string> messages = new();
+
+    private void SendMessage()
+    {
+        messages.Add(message);
+        message = "";
+    }
+
+}
