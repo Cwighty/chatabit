@@ -15,6 +15,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ChatDbContext>(options =>
 
   options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services
+    .AddHttpClient("My.ServerAPI", client => client.BaseAddress = new Uri("http://localhost:5269"));
+
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("My.ServerAPI"));
+
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -39,5 +47,7 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(Counter).Assembly);
+
+app.MapControllers();
 
 app.Run();

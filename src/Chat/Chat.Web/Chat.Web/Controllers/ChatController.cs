@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Chat.Web.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ChatController : ControllerBase
 {
   private readonly ChatDbContext _context;
@@ -17,15 +17,15 @@ public class ChatController : ControllerBase
   }
 
   [HttpGet]
-  public async Task<ActionResult<IEnumerable<Message>>> GetMessages()
+  public async Task<ActionResult<IEnumerable<ChatMessage>>> GetMessages()
   {
-    return await _context.Messages.ToListAsync();
+    return await _context.ChatMessages.ToListAsync();
   }
 
   [HttpPost]
-  public async Task<ActionResult<Message>> PostMessage(Message message)
+  public async Task<ActionResult<ChatMessage>> PostMessage(ChatMessage message)
   {
-    _context.Messages.Add(message);
+    _context.ChatMessages.Add(message);
     await _context.SaveChangesAsync();
 
     return Created();

@@ -9,5 +9,6 @@ create table person (
 create table chat_message (
     id serial primary key,
     message_text text not null,
-    created_at timestamp not null default now()
+    created_at timestamp not null default now(),
+    user_name text not null
 );

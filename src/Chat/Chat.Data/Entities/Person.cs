@@ -1,4 +1,7 @@
-﻿namespace Chat.Data.Entities;
+﻿using System;
+using System.Collections.Generic;
+
+namespace Chat.Data.Entities;
 
 public partial class Person
 {

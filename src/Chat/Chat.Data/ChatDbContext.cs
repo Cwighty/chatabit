@@ -12,25 +12,25 @@ public partial class ChatDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Message> Messages { get; set; }
+    public virtual DbSet<ChatMessage> ChatMessages { get; set; }
 
     public virtual DbSet<Person> People { get; set; }
 
-    /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Message>(entity =>
+        modelBuilder.Entity<ChatMessage>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("message_pkey");
+            entity.HasKey(e => e.Id).HasName("chat_message_pkey");
 
-            entity.ToTable("message");
+            entity.ToTable("chat_message");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
-            entity.Property(e => e.Message1).HasColumnName("message");
+            entity.Property(e => e.MessageText).HasColumnName("message_text");
+            entity.Property(e => e.UserName).HasColumnName("user_name");
         });
 
         modelBuilder.Entity<Person>(entity =>
@@ -43,7 +43,7 @@ public partial class ChatDbContext : DbContext
             entity.Property(e => e.Name).HasColumnName("name");
         });
 
-        this.OnModelCreatingPartial(modelBuilder);
+        OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
