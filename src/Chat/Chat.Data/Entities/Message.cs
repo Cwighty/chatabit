@@ -2,9 +2,9 @@
 
 public partial class Message
 {
-  public int Id { get; set; }
+    public int Id { get; set; }
 
-  public string Message1 { get; set; } = null!;
+    public string Message1 { get; set; } = null!;
 
-  public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
