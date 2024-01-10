@@ -12,13 +12,13 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - /home/caleb/chatdata/data:/var/lib/postgresql/data
-      - ../chatdb/init-scripts:/docker-entrypoint-initdb.d
+      - ../src/ChatDatabase/init-scripts:/docker-entrypoint-initdb.d
     restart: always
 
   chat:
     container_name: chat
     build:
-      context: ../app/
+      context: ../src/Chat/Chat.Web/Chat.Web
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
     restart: always

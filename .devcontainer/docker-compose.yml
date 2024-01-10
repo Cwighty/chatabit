@@ -30,7 +30,7 @@ services:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=chatdb;Username=admin;Password=chatpassword!
     command: >
       sh -c "
-        cd app/chat
+        cd src/Chat/Chat.Web/Chat.Web
         dotnet watch run --non-interactive --no-hot-reload
         "
     ports:
@@ -47,7 +47,7 @@ services:
       POSTGRES_PASSWORD: chatpassword!
     volumes:
       - chat_db_data:/var/lib/postgresql/data
-      - ../chatdb/init-scripts:/docker-entrypoint-initdb.d
+      - ../src/ChatDatabase/init-scripts:/docker-entrypoint-initdb.d
 
 volumes:
   developer_home:
