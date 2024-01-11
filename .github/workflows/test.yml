@@ -15,10 +15,10 @@ jobs:
         run: |
           cd src/Chat
           docker build -t chat_tests -f Dockerfile .
-          docker run -i --rm -v ${{ github.workspace }}:/work chat_tests dotnet test --logger trx || echo "Tests failed, check the logs for details."
+          docker run -i --rm -v ${{ github.workspace }}:/app chat_tests dotnet test --logger trx
 
       - name: Upload test results
         uses: actions/upload-artifact@v2
         with:
           name: test-results
-          path: TestResults.trx
+          path: ${{ github.workspace }}/app/Chat.UnitTests/TestResults/

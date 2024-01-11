@@ -14,5 +14,5 @@ jobs:
       - name: Format
         run: |
           cd src/Chat
-          docker build -t chat_format -f Dockerfile .
+          docker build --no-cache -t chat_format -f Dockerfile .
           docker run -i --rm chat_format dotnet format --verify-no-changes --verbosity diagnostic
