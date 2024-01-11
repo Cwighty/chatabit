@@ -16,7 +16,8 @@ services:
   chat:
     container_name: chat
     build:
-      context: ../src/Chat/Chat.Web/Chat.Web
+      context: ../src/Chat/
+      dockerfile: Chat.Web/Chat.Web/Dockerfile
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
     restart: always

@@ -9,16 +9,17 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Chat.Web/Chat.Web.csproj", "Chat.Web/"]
-COPY ["Chat.Web.Client/Chat.Web.Client.csproj", "Chat.Web.Client/"]
-RUN dotnet restore "Chat.Web/Chat.Web.csproj"
+COPY ["Chat.Web/Chat.Web/Chat.Web.csproj", "Chat.Web/Chat.Web/"]
+COPY ["Chat.Data/Chat.Data.csproj", "Chat.Data/"]
+COPY ["Chat.Web/Chat.Web.Client/Chat.Web.Client.csproj", "Chat.Web/Chat.Web.Client/"]
+RUN dotnet restore "./Chat.Web/Chat.Web/./Chat.Web.csproj"
 COPY . .
-WORKDIR "/src/Chat.Web"
-RUN dotnet build "Chat.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Chat.Web/Chat.Web"
+RUN dotnet build "./Chat.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "Chat.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Chat.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
