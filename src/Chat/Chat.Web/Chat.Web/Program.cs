@@ -17,7 +17,7 @@ builder.Services.AddDbContext<ChatDbContext>(options =>
   options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services
-    .AddHttpClient("My.ServerAPI", client => client.BaseAddress = new Uri("http://localhost:5269"));
+    .AddHttpClient("My.ServerAPI", client => client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"] ?? throw new Exception("ApiBaseAddress not found in configuration")));
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("My.ServerAPI"));
 
