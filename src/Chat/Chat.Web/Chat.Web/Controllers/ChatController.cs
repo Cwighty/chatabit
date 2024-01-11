@@ -9,25 +9,25 @@ namespace Chat.Web.Controllers;
 [Route("api/[controller]")]
 public class ChatController : ControllerBase
 {
-  private readonly ChatDbContext _context;
+    private readonly ChatDbContext _context;
 
-  public ChatController(ChatDbContext context)
-  {
-    _context = context;
-  }
+    public ChatController(ChatDbContext context)
+    {
+        _context = context;
+    }
 
-  [HttpGet]
-  public async Task<ActionResult<IEnumerable<ChatMessage>>> GetMessages()
-  {
-    return await _context.ChatMessages.ToListAsync();
-  }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ChatMessage>>> GetMessages()
+    {
+        return await _context.ChatMessages.ToListAsync();
+    }
 
-  [HttpPost]
-  public async Task<ActionResult<ChatMessage>> PostMessage(ChatMessage message)
-  {
-    _context.ChatMessages.Add(message);
-    await _context.SaveChangesAsync();
+    [HttpPost]
+    public async Task<ActionResult<ChatMessage>> PostMessage(ChatMessage message)
+    {
+        _context.ChatMessages.Add(message);
+        await _context.SaveChangesAsync();
 
-    return Created();
-  }
+        return Created();
+    }
 }
