@@ -1,6 +1,5 @@
 version: "3.9"
 services:
-
   postgres:
     image: postgres:latest
     container_name: chatdb
@@ -12,7 +11,7 @@ services:
       POSTGRES_PASSWORD: chatpassword!
     volumes:
       - chat_db_data:/var/lib/postgresql/data
-      - ./ChatDatabase/init-scripts:/docker-entrypoint-initdb.d
+      - ./src/ChatDatabase/init-scripts:/docker-entrypoint-initdb.d
 
 volumes:
   chat_db_data:
