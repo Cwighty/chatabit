@@ -1,8 +1,6 @@
 To run the project:
 
-- Open the repo in Visual Studio Code
-- Install the devcontainer extension (if not already installed)
-- Ctrl-Shift-P to bring up the action window
-- Search and execute "Reopen in container"
-- This will install dependencies and start all the services in the docker compose
-- Open [http://localhost:5000/](http://localhost:5000/)
+- There is a docker-compose.yml file in /src, running this will stand up the database
+  - `docker compose up -d`
+- Then either run the project in Visual Studio or run the following commands in the /src/Chat/Chat.Web/Chat.Web folder:
+  - `dotnet run`
