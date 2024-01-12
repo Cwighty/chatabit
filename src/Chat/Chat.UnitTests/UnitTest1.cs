@@ -11,7 +11,7 @@ public class Tests
         var result = UsernameValidator.IsValid(username);
         Assert.IsTrue(result);
     }
-    
+
     [Test]
     public void EmptyUsernameShouldValidateFalse()
     {

@@ -53,7 +53,7 @@
         };
 
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
-        
+
         Messages = await HttpClient.GetFromJsonAsync<List<ChatMessage>>("api/chat");
 
         message = "";
