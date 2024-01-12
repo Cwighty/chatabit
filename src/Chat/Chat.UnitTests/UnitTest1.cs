@@ -1,15 +1,22 @@
+using Chat.Data.Validators;
+
 namespace Chat.UnitTests;
 
 public class Tests
 {
-    [SetUp]
-    public void Setup()
-    {
-    }
-
     [Test]
-    public void Test1()
+    public void NotEmptyUsernameShouldValidateTrue()
     {
-        Assert.Pass();
+        var username = "test";
+        var result = UsernameValidator.IsValid(username);
+        Assert.IsTrue(result);
+    }
+    
+    [Test]
+    public void EmptyUsernameShouldValidateFalse()
+    {
+        var username = "";
+        var result = UsernameValidator.IsValid(username);
+        Assert.IsFalse(result);
     }
 }

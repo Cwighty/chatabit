@@ -1,22 +1,38 @@
 @page "/Chat"
 @using global::Chat.Data.Entities
 @inject HttpClient HttpClient
-<h3>Chat</h3>
 
-<InputText @bind-Value="username"/>
-
-<div>
+<div class="container">
+    <div style="display: flex; flex-direction: column-reverse; max-height: 500px; overflow-y: auto">
+        @if (Messages == null)
+        {
+            <div class="alert alert-info">Loading...</div>
+        }
         @foreach (var m in Messages)
         {
-            <p>@m.MessageText</p>
+            <div class="card mb-3">
+                <div class="card-header">
+                    @m.UserName
+                    <small class="text-muted ml-2">@m.CreatedAt.ToString("g")</small>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">@m.MessageText</p>
+                </div>
+            </div>
         }
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Username</label>
+        <InputText @bind-Value="username" class="form-control"/>
+    </div>
+    <div class="form-group mb-3">
+        <label>Message</label>
+        <InputText @bind-Value="message" class="form-control"/>
+        <button @onclick="SendMessage" class="btn btn-primary mt-3">Send</button>
+    </div>
 </div>
 
-<div class="form-group">
-    <label for="message">Message</label>
-    <InputText @bind-Value="message" class="form-control"/>
-    <button @onclick="SendMessage">Send</button>
-</div>
 
 @code {
     private string message = "";
@@ -35,9 +51,11 @@
             MessageText = message,
             UserName = username
         };
-        
+
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
         
+        Messages = await HttpClient.GetFromJsonAsync<List<ChatMessage>>("api/chat");
+
         message = "";
     }
 
