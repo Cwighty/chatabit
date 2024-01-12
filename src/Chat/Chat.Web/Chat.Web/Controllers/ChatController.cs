@@ -1,4 +1,4 @@
-using Chat.Data;
+﻿using Chat.Data;
 using Chat.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

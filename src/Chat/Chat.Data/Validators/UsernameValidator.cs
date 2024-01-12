@@ -1,4 +1,4 @@
-namespace Chat.Data.Validators;
+﻿namespace Chat.Data.Validators;
 
 public class UsernameValidator
 {

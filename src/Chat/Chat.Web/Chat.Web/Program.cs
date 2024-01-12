@@ -1,4 +1,4 @@
-using Chat.Data;
+﻿using Chat.Data;
 using Chat.Web.Client.Pages;
 using Chat.Web.Components;
 using Microsoft.EntityFrameworkCore;

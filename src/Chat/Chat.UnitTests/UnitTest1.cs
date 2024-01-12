@@ -1,4 +1,4 @@
-using Chat.Data.Validators;
+﻿using Chat.Data.Validators;
 
 namespace Chat.UnitTests;
 
