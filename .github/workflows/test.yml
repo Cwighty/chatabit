@@ -5,7 +5,7 @@ on:
   workflow_call:
 
 jobs:
-  test:
+  unit-test:
     runs-on: [self-hosted]
     steps:
       - name: Checkout code
@@ -15,4 +15,20 @@ jobs:
         run: |
           cd src/Chat
           docker build -t chat_tests -f Dockerfile .
-          docker run -i --rm chat_tests dotnet test
+          docker run -i --rm chat_tests /bin/bash -c "cd Chat.UnitTests; dotnet test"
+          
+  integration-test:
+    runs-on: [self-hosted]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Dotnet
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "8.0"
+          
+      - name: Restore dependencies and run tests
+        run: |
+          cd src/Chat/Chat.IntegrationTests
+          dotnet test

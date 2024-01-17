@@ -9,6 +9,7 @@ COPY Chat.Web/Chat.Web/*.csproj ./Chat.Web/Chat.Web/
 COPY Chat.Web/Chat.Web.Client/*.csproj ./Chat.Web/Chat.Web.Client/
 COPY Chat.Data/*.csproj ./Chat.Data/
 COPY Chat.UnitTests/*.csproj ./Chat.UnitTests/
+COPY Chat.IntegrationTests/*.csproj ./Chat.IntegrationTests/
 RUN dotnet restore
 
 # Copy everything else and build
