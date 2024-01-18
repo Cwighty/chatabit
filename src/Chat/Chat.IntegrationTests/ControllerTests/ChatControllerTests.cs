@@ -25,7 +25,16 @@ namespace Chat.IntegrationTests.ControllerTests
             public async Task GetChatMessagesTestAsync_ShouldContainAMessage()
             {
                 var scope = factory.Services.GetService<IServiceScopeFactory>()?.CreateScope();
-                var dbContext = scope?.ServiceProvider.GetRequiredService<ChatDbContext>();
+                if (scope == null)
+                {
+                    throw new InvalidOperationException("Service scope could not be created.");
+                }
+
+                var dbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
+                if (dbContext == null)
+                {
+                    throw new InvalidOperationException("Database context could not be obtained.");
+                }
 
                 var chatMessage = new ChatMessage
                 {
@@ -40,41 +49,60 @@ namespace Chat.IntegrationTests.ControllerTests
                 var response = await httpClient.GetAsync("/api/Chat/");
                 response.EnsureSuccessStatusCode();
                 var responseString = await response.Content.ReadAsStringAsync();
-                var messages = JsonConvert.DeserializeObject<List<ChatMessage>>(responseString);
 
-                Assert.Single(messages);
-            }
-        }
-
-        public class PostChatMessageTest : IClassFixture<ChatApiWebApplicationFactory>
-        {
-            private HttpClient httpClient { get; }
-            private readonly ChatApiWebApplicationFactory factory;
-
-            public PostChatMessageTest(ChatApiWebApplicationFactory factory)
-            {
-                this.factory = factory;
-                httpClient = factory.CreateClient();
-            }
-
-            [Fact]
-            public async Task PostChatMessageTestAsync_ShouldContainAMessage()
-            {
-                var scope = factory.Services.GetService<IServiceScopeFactory>()?.CreateScope();
-                var dbContext = scope?.ServiceProvider.GetRequiredService<ChatDbContext>();
-
-                var chatMessage = new ChatMessage
+                if (string.IsNullOrEmpty(responseString))
                 {
-                    MessageText = "Test message",
-                    CreatedAt = DateTime.Now,
-                    UserName = "Test user"
-                };
+                    throw new InvalidOperationException("Response content is empty or null.");
+                }
 
-                var response = await httpClient.PostAsJsonAsync("/api/Chat/", chatMessage);
-                response.EnsureSuccessStatusCode();
+                var messages = JsonConvert.DeserializeObject<List<ChatMessage>>(responseString);
+                if (messages == null)
+                {
+                    throw new InvalidOperationException("Failed to deserialize the response content.");
+                }
 
-                var messages = await dbContext.ChatMessages.ToListAsync();
                 Assert.Single(messages);
+            }
+
+            public class PostChatMessageTest : IClassFixture<ChatApiWebApplicationFactory>
+            {
+                private HttpClient httpClient { get; }
+                private readonly ChatApiWebApplicationFactory factory;
+
+                public PostChatMessageTest(ChatApiWebApplicationFactory factory)
+                {
+                    this.factory = factory;
+                    httpClient = factory.CreateClient();
+                }
+
+                [Fact]
+                public async Task PostChatMessageTestAsync_ShouldContainAMessage()
+                {
+                    var scope = factory.Services.GetService<IServiceScopeFactory>()?.CreateScope();
+                    if (scope == null)
+                    {
+                        throw new InvalidOperationException("Service scope could not be created.");
+                    }
+
+                    var dbContext = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
+                    if (dbContext == null)
+                    {
+                        throw new InvalidOperationException("Database context could not be obtained.");
+                    }
+
+                    var chatMessage = new ChatMessage
+                    {
+                        MessageText = "Test message",
+                        CreatedAt = DateTime.Now,
+                        UserName = "Test user"
+                    };
+
+                    var response = await httpClient.PostAsJsonAsync("/api/Chat/", chatMessage);
+                    response.EnsureSuccessStatusCode();
+
+                    var messages = await dbContext.ChatMessages.ToListAsync();
+                    Assert.Single(messages);
+                }
             }
         }
     }
