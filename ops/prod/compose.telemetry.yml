@@ -23,19 +23,24 @@ services:
     image: openzipkin/zipkin:latest
     # ports:
     # - "9412:9411"
+    volumes:
+      - zipkin-data:/zipkin
 
   prometheus:
     container_name: dc-prometheus
     image: prom/prometheus:latest
-    volumes:
-      - ./config-files/prometheus.yaml:/etc/prometheus/prometheus.yml
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--web.listen-address=:8080"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
     # ports:
     #   - "8080:8080"
     environment:
       - config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./config-files/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
 
   loki:
     container_name: dc-loki
@@ -62,3 +67,5 @@ services:
 
 volumes:
   loki-data:
+  zipkin-data:
+  prometheus-data:
