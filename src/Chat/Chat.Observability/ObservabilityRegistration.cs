@@ -5,11 +5,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Exceptions;
 using Serilog.Settings.Configuration;
 using Serilog.Sinks.OpenTelemetry;
 
@@ -113,6 +116,9 @@ public static class ObservabilityRegistration
                     .ReadFrom.Configuration(context.Configuration, configOptions)
                     .Enrich.FromLogContext()
                     .Enrich.WithEnvironment(environment)
+                    .Enrich.WithMachineName()
+                    .Enrich.WithExceptionDetails()
+                    .Enrich.WithDemystifiedStackTraces()
                     .Enrich.WithProperty("ApplicationName", observabilityOptions.ServiceName);
 
                 options.WriteTo.OpenTelemetry(cfg =>
@@ -127,5 +133,22 @@ public static class ObservabilityRegistration
             }
         );
         return hostBuilder;
+    }
+
+    public static ILoggingBuilder AddOpenTelemetryLogging(this ILoggingBuilder loggingBuilder, ObservabilityOptions observabilityOptions)
+    {
+        loggingBuilder.AddOpenTelemetry(options =>
+        {
+            options.IncludeScopes = true;
+            options.ParseStateValues = true;
+            options.IncludeFormattedMessage = true;
+            options.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(observabilityOptions.ServiceName))
+            .AddOtlpExporter(otlp =>
+            {
+                otlp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+                otlp.Endpoint = observabilityOptions.CollectorUri;
+            });
+        });
+        return loggingBuilder;
     }
 }
