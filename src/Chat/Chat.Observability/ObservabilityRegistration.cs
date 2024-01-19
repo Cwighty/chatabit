@@ -10,6 +10,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Settings.Configuration;
 using Serilog.Sinks.OpenTelemetry;
 
 namespace Chat.Observability;
@@ -103,11 +104,13 @@ public static class ObservabilityRegistration
 
                 configuration.GetSection(nameof(ObservabilityOptions)).Bind(observabilityOptions);
 
-                var serilogSection =
-                    $"{nameof(ObservabilityOptions)}:{nameof(ObservabilityOptions)}:Serilog";
+                var configOptions = new ConfigurationReaderOptions()
+                {
+                    SectionName = $"{nameof(ObservabilityOptions)}:{nameof(ObservabilityOptions)}:Serilog",
+                };
 
                 options
-                    .ReadFrom.Configuration(context.Configuration, serilogSection)
+                    .ReadFrom.Configuration(context.Configuration, configOptions)
                     .Enrich.FromLogContext()
                     .Enrich.WithEnvironment(environment)
                     .Enrich.WithProperty("ApplicationName", observabilityOptions.ServiceName);
@@ -119,9 +122,6 @@ public static class ObservabilityRegistration
                     cfg.ResourceAttributes = new Dictionary<string, object>
                     {
                         { "service.name", observabilityOptions.ServiceName },
-                        { "index", 10 },
-                        { "flag", true },
-                        { "value", 3.14 }
                     };
                 });
             }
