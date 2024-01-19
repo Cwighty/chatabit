@@ -1,5 +1,8 @@
 version: "3.9"
 
+include:
+  - compose.telemetry.yml
+
 services:
   postgres:
     image: postgres:latest
@@ -16,7 +19,7 @@ services:
   chat:
     container_name: chat
     build:
-      context: ../src/Chat/
+      context: ../../src/Chat/
       dockerfile: Chat.Web/Chat.Web/Dockerfile
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
