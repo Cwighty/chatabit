@@ -1,4 +1,5 @@
 ﻿using Chat.Data;
+using Chat.Observability;
 using Chat.Web.Client.Pages;
 using Chat.Web.Components;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,8 @@ public class Program
         builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("My.ServerAPI"));
 
         builder.Services.AddControllers();
+
+        builder.AddObservability();
 
         var app = builder.Build();
 
