@@ -6,7 +6,7 @@ include:
 services:
   postgres:
     image: postgres:latest
-    container_name: chat-db
+    container_name: dc-postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -17,7 +17,7 @@ services:
     restart: always
 
   chat:
-    container_name: chat
+    container_name: dc-chat
     build:
       context: ../../src/Chat/
       dockerfile: Chat.Web/Chat.Web/Dockerfile
@@ -27,6 +27,7 @@ services:
     restart: always
 
   swag:
+    container_name: dc-swag
     image: lscr.io/linuxserver/swag
     cap_add:
       - NET_ADMIN
