@@ -49,9 +49,8 @@ services:
     #   - "3000:3000"
     volumes:
       - ./config-files/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./config-files/grafana.ini:/etc/grafana/grafana.ini
     environment:
-      GF_SECURITY_ADMIN_USER: Admin
-      GF_SECURITY_ADMIN_PASSWORD: password
     depends_on:
       - zipkin
       - prometheus
