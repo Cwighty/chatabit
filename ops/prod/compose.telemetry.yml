@@ -24,7 +24,7 @@ services:
     # ports:
     # - "9412:9411"
     volumes:
-      - zipkin-data:/zipkin
+      - dc-zipkin-data:/zipkin
 
   prometheus:
     container_name: dc-prometheus
@@ -40,14 +40,14 @@ services:
       - config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./config-files/prometheus.yaml:/etc/prometheus/prometheus.yml
-      - prometheus-data:/prometheus
+      - dc-prometheus-data:/prometheus
 
   loki:
     container_name: dc-loki
     image: grafana/loki:latest
     command: ["-config.file=/etc/loki/local-config.yaml"]
     volumes:
-      - loki-data:/loki
+      - dc-loki-data:/loki
 
   grafana:
     container_name: dc-grafana
@@ -66,6 +66,6 @@ services:
       - collector
 
 volumes:
-  loki-data:
-  zipkin-data:
-  prometheus-data:
+  dc-loki-data:
+  dc-zipkin-data:
+  dc-prometheus-data:
