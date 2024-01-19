@@ -4,3 +4,9 @@ To run the project:
   - `docker compose up -d`
 - Then either run the project in Visual Studio or run the following commands in the /src/Chat/Chat.Web/Chat.Web folder:
   - `dotnet run`
+ 
+### Telemetry
+- To start up the telemetry stack in dev
+  - `cd ops/dev/Telemetry`
+  - `docker compose up -d`
+  - Grafana is hosted at [localhost:3000](http://localhost:3000)
