@@ -1,5 +1,6 @@
 ﻿using Chat.Data;
 using Chat.Observability;
+using Chat.Observability.Middleware;
 using Chat.Web.Client.Pages;
 using Chat.Web.Components;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,8 @@ public class Program
         builder.AddObservability();
 
         var app = builder.Build();
+
+        app.UseTraceIdResponseHeader();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
