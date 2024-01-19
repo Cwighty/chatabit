@@ -20,7 +20,7 @@ jobs:
   #   uses: ./.github/workflows/test.yml
 
   deploy-application:
-    needs: tests
+    # needs: tests
     runs-on: [self-hosted]
     steps:
       - name: checkout repo
