@@ -29,6 +29,8 @@ services:
       - "3000:3000"
     volumes:
       - ./config-files/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./config-files/grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/default.yaml
+      - ./dashboards:/var/lib/grafana/dashboards
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin

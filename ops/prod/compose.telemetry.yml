@@ -41,6 +41,8 @@ services:
     container_name: dc-loki
     image: grafana/loki:latest
     command: ["-config.file=/etc/loki/local-config.yaml"]
+    volumes:
+      - loki-data:/loki
 
   grafana:
     container_name: dc-grafana
@@ -49,11 +51,14 @@ services:
     #   - "3000:3000"
     volumes:
       - ./config-files/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./config-files/grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/default.yaml
+      - ./dashboards:/var/lib/grafana/dashboards
       - ./config-files/grafana.ini:/etc/grafana/grafana.ini
-      - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/main.yaml
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
       - zipkin
       - prometheus
       - loki
       - collector
+
+volumes:
+  loki-data:
