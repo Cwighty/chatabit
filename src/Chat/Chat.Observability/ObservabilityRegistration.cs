@@ -84,7 +84,16 @@ public static class ObservabilityRegistration
             builder.Services.AddSingleton(meter);
 
             metrics
-                .AddMeter(meter.Name)
+                .AddMeter(
+                meter.Name,
+                "Microsoft.AspNetCore.Hosting",
+                "Microsoft.AspNetCore.Hosting.Metrics",
+                "Microsoft.AspNetCore.Diagnostics",
+                "Microsoft.AspNetCore.HeaderParsing",
+                "Microsoft.Extensions.Diagnostics.HealthChecks",
+                "Microsoft.Extensions.Diagnostics.ResourceMonitoring",
+                "System.Net.Http"
+                )
                 .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(meter.Name))
                 .AddAspNetCoreInstrumentation();
 

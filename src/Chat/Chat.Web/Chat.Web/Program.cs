@@ -1,7 +1,6 @@
 ﻿using Chat.Data;
 using Chat.Observability;
 using Chat.Web;
-using Chat.Web.Client.Pages;
 using Chat.Web.Components;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +16,7 @@ public class Program
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddHealthChecks();
 
         builder.Services.AddDbContext<ChatDbContext>(options =>
 
@@ -56,8 +56,9 @@ public class Program
 
         app.MapRazorComponents<App>()
             .AddInteractiveWebAssemblyRenderMode()
-            .AddAdditionalAssemblies(typeof(Counter).Assembly);
+            .AddAdditionalAssemblies(typeof(Chat.Web.Client.Pages.Counter).Assembly);
 
+        app.MapHealthChecks("/health"); 
         app.MapControllers();
 
         app.Run();

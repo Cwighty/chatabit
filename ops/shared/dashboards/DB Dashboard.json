@@ -1,253 +1,363 @@
 {
-  "annotations": {
-    "list": [
-      {
-        "builtIn": 1,
-        "datasource": {
-          "type": "grafana",
-          "uid": "-- Grafana --"
-        },
-        "enable": true,
-        "hide": true,
-        "iconColor": "rgba(0, 211, 255, 1)",
-        "name": "Annotations & Alerts",
-        "type": "dashboard"
-      }
-    ]
-  },
-  "editable": true,
-  "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
-  "id": 4,
-  "links": [],
-  "liveNow": false,
-  "panels": [
-    {
-      "datasource": {
-        "type": "tempo",
-        "uid": "tempo"
-      },
-      "description": "What are the slowest queries?",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "db.statement (uniqueValues)"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Db Query"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "db.statement (distinctCount)"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Query Ct."
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Db Query"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 917
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "db.statement (distinctCount)"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 110
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Trace Name"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 160
-              },
-              {
-                "id": "displayName",
-                "value": "Endpoint"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "duration (mean)"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 138
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Query Ct."
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 84
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 13,
-        "x": 0,
-        "y": 0
-      },
-      "id": 1,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": ["sum"],
-          "show": false
-        },
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "duration (mean)"
-          }
-        ]
-      },
-      "pluginVersion": "10.2.3",
-      "targets": [
+    "annotations": {
+      "list": [
         {
+          "builtIn": 1,
           "datasource": {
-            "type": "tempo",
-            "uid": "tempo"
+            "type": "grafana",
+            "uid": "-- Grafana --"
           },
-          "filters": [
-            {
-              "id": "eab2b38a",
-              "operator": "=",
-              "scope": "span"
-            },
-            {
-              "id": "service-name",
-              "operator": "=",
-              "scope": "resource",
-              "tag": "service.name",
-              "value": ["ChatApi"],
-              "valueType": "string"
-            },
-            {
-              "id": "span-name",
-              "operator": "=",
-              "scope": "span",
-              "tag": "name",
-              "valueType": "string"
-            }
-          ],
-          "limit": 20,
-          "query": "{resource.service.name=\"ChatApi\" && name=\"chatdb\"} | select(span.db.statement)",
-          "queryType": "traceql",
-          "refId": "A",
-          "tableType": "spans"
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
         }
-      ],
-      "title": "Slowest EFCore Translated Queries",
-      "transformations": [
-        {
-          "id": "groupBy",
-          "options": {
-            "fields": {
-              "Trace Name": {
-                "aggregations": [],
-                "operation": "groupby"
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+      {
+        "datasource": {
+          "type": "tempo",
+          "uid": "tempo"
+        },
+        "description": "What are the slowest queries?",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
               },
-              "db.statement": {
-                "aggregations": ["distinctCount", "uniqueValues"],
-                "operation": "aggregate"
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "db.statement (uniqueValues)"
               },
-              "duration": {
-                "aggregations": ["mean", "max"],
-                "operation": "aggregate"
+              "properties": [
+                {
+                  "id": "displayName",
+                  "value": "Db Query"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "db.statement (distinctCount)"
               },
-              "traceName": {
-                "aggregations": [],
-                "operation": "groupby"
+              "properties": [
+                {
+                  "id": "displayName",
+                  "value": "Query Ct."
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Db Query"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 917
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "db.statement (distinctCount)"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 110
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Trace Name"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 160
+                },
+                {
+                  "id": "displayName",
+                  "value": "Endpoint"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "duration (mean)"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 138
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Query Ct."
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 84
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 13,
+          "x": 0,
+          "y": 0
+        },
+        "id": 1,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true,
+          "sortBy": [
+            {
+              "desc": true,
+              "displayName": "duration (mean)"
+            }
+          ]
+        },
+        "pluginVersion": "10.2.3",
+        "targets": [
+          {
+            "datasource": {
+              "type": "tempo",
+              "uid": "tempo"
+            },
+            "filters": [
+              {
+                "id": "eab2b38a",
+                "operator": "=",
+                "scope": "span"
+              },
+              {
+                "id": "service-name",
+                "operator": "=",
+                "scope": "resource",
+                "tag": "service.name",
+                "value": [
+                  "ChatApi"
+                ],
+                "valueType": "string"
+              },
+              {
+                "id": "span-name",
+                "operator": "=",
+                "scope": "span",
+                "tag": "name",
+                "valueType": "string"
+              }
+            ],
+            "limit": 20,
+            "query": "{resource.service.name=\"ChatApi\" && name=\"chatdb\"} | select(span.db.statement)",
+            "queryType": "traceql",
+            "refId": "A",
+            "tableType": "spans"
+          }
+        ],
+        "title": "Slowest EFCore Translated Queries",
+        "transformations": [
+          {
+            "id": "groupBy",
+            "options": {
+              "fields": {
+                "Trace Name": {
+                  "aggregations": [],
+                  "operation": "groupby"
+                },
+                "db.statement": {
+                  "aggregations": [
+                    "distinctCount",
+                    "uniqueValues"
+                  ],
+                  "operation": "aggregate"
+                },
+                "duration": {
+                  "aggregations": [
+                    "mean",
+                    "max"
+                  ],
+                  "operation": "aggregate"
+                },
+                "traceName": {
+                  "aggregations": [],
+                  "operation": "groupby"
+                }
               }
             }
           }
-        }
-      ],
-      "type": "table"
-    }
-  ],
-  "refresh": "",
-  "schemaVersion": 39,
-  "tags": [],
-  "templating": {
-    "list": []
-  },
-  "time": {
-    "from": "now-6h",
-    "to": "now"
-  },
-  "timepicker": {},
-  "timezone": "",
-  "title": "Database Query Overview",
-  "uid": "f9047259-cdb9-4636-b322-2d7981896efd",
-  "version": 3,
-  "weekStart": ""
-}
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "id": 2,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "http_client_open_connections",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": true,
+            "key": "Q-8092de8c-3f44-457f-8f8b-67770424a505-0",
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "New Panel",
+        "transformations": [],
+        "type": "timeseries"
+      }
+    ],
+    "refresh": "",
+    "schemaVersion": 39,
+    "tags": [],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Database Query Overview",
+    "uid": "f9047259-cdb9-4636-b322-2d7981896efd",
+    "version": 8,
+    "weekStart": ""
+  }
