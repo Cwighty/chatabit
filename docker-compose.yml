@@ -1,4 +1,6 @@
-version: "3.9"
+include:
+  - ./ops/dev/observability/docker-compose.yml
+
 services:
   postgres:
     image: postgres:latest
