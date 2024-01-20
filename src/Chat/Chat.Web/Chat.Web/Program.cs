@@ -1,6 +1,6 @@
 ﻿using Chat.Data;
 using Chat.Observability;
-using Chat.Observability.Middleware;
+using Chat.Web;
 using Chat.Web.Client.Pages;
 using Chat.Web.Components;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +30,8 @@ public class Program
         builder.Services.AddControllers();
 
         builder.AddObservability();
+        
+        builder.Services.AddSingleton<UserActivityTracker>();
 
         var app = builder.Build();
 

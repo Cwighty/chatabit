@@ -1,4 +1,5 @@
-﻿using Chat.Data;
+﻿using System.Diagnostics.Metrics;
+using Chat.Data;
 using Chat.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +11,18 @@ namespace Chat.Web.Controllers;
 public class ChatController : ControllerBase
 {
     private readonly ChatDbContext _context;
-
-    public ChatController(ChatDbContext context)
+    private readonly ILogger<ChatController> _logger;
+    private readonly Meter _meter;
+    private readonly Counter<int> _sentMessages;
+    private readonly UserActivityTracker _userActivityTracker;
+    
+    public ChatController(ChatDbContext context, ILogger<ChatController> logger, Meter meter)
     {
         _context = context;
+        _logger = logger;
+        _meter = meter;
+        _sentMessages = _meter.CreateCounter<int>("chatapi.messages_sent", null, "Number of messages sent");
+        _userActivityTracker = new UserActivityTracker(meter);
     }
 
     [HttpGet]
@@ -27,6 +36,11 @@ public class ChatController : ControllerBase
     {
         _context.ChatMessages.Add(message);
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("Message posted by {UserName} at {CreatedAt}", message.UserName, message.CreatedAt);
+        _sentMessages.Add(1);
+        
+        _userActivityTracker.TrackUserActivity(message);
 
         return Created();
     }

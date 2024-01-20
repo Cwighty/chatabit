@@ -78,6 +78,8 @@ public static class ObservabilityRegistration
         builder.WithMetrics(metrics =>
         {
             var meter = new Meter(observabilityOptions.ServiceName);
+            
+            builder.Services.AddSingleton(meter);
 
             metrics
                 .AddMeter(meter.Name)
