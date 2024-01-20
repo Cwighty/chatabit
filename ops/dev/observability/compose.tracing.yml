@@ -1,10 +1,10 @@
 services:
-  zipkin:
-    image: openzipkin/zipkin:latest
-    ports:
-      - "9412:9411"
-    networks:
-      - practical-otel-net
+  # zipkin:
+  #   image: openzipkin/zipkin:latest
+  #   ports:
+  #     - "9412:9411"
+  #   networks:
+  #     - practical-otel-net
 
   tempo:
     image: grafana/tempo:latest
@@ -14,3 +14,5 @@ services:
       - "4317" # otlp grpc
     volumes:
       - ../../shared/config-files/tempo.yaml:/etc/tempo.yaml
+    networks:
+      - practical-otel-net

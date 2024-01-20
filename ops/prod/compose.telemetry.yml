@@ -4,7 +4,7 @@ services:
     image: otel/opentelemetry-collector-contrib:latest
     command: ["--config=/etc/otel-collector.yaml"]
     volumes:
-      - ./config-files/otel-collector.yaml:/etc/otel-collector.yaml
+      - ../shared/config-files/otel-collector.yaml:/etc/otel-collector.yaml
     # ports:
     # - 1888:1888 # pprof extension
     # - 13133:13133 # health_check extension
@@ -14,17 +14,20 @@ services:
     # - 4317:4317 # OTLP gRPC receiver
     # - 4318:4318 # OTLP http receiver
     depends_on:
-      - zipkin
+      - tempo
       - prometheus
       - loki
 
-  zipkin:
-    container_name: dc-zipkin
-    image: openzipkin/zipkin:latest
+  tempo:
+    container_name: dc-tempo
+    image: grafana/tempo:latest
+    command: ["-config.file=/etc/tempo.yaml"]
     # ports:
-    # - "9412:9411"
+    # - "3200:3200" # tempo
+    # - "4317" # otlp grpc
     volumes:
-      - dc-zipkin-data:/zipkin
+      - ../shared/config-files/tempo.yaml:/etc/tempo.yaml
+      - dc-tempo-data:/tmp/tempo
 
   prometheus:
     container_name: dc-prometheus
@@ -39,7 +42,7 @@ services:
     environment:
       - config.file=/etc/prometheus/prometheus.yml
     volumes:
-      - ./config-files/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ../shared/config-files/prometheus.yaml:/etc/prometheus/prometheus.yml
       - dc-prometheus-data:/prometheus
 
   loki:
@@ -55,17 +58,17 @@ services:
     # ports:
     #   - "3000:3000"
     volumes:
-      - ./config-files/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
-      - ./config-files/grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/default.yaml
+      - ../shared/config-files/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ../shared/config-files/grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/default.yaml
       - ./dashboards:/var/lib/grafana/dashboards
       - ./config-files/grafana.ini:/etc/grafana/grafana.ini
     depends_on:
-      - zipkin
+      - tempo
       - prometheus
       - loki
       - collector
 
 volumes:
   dc-loki-data:
-  dc-zipkin-data:
+  dc-tempo-data:
   dc-prometheus-data:
