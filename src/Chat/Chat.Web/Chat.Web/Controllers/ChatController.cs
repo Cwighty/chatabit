@@ -53,6 +53,12 @@ public class ChatController : ControllerBase
     {
         try
         {
+            var randomError = new Random().Next(0, 100);
+            if (randomError > 80)
+            {
+                throw new Exception("Random error");
+            }
+
             _context.ChatMessages.Add(message);
             await _context.SaveChangesAsync();
 
@@ -70,7 +76,7 @@ public class ChatController : ControllerBase
         }
         finally
         {
-            DiagnosticConfig.TrackControllerCall(nameof(ChatController), nameof(GetMessages));
+            DiagnosticConfig.TrackControllerCall(nameof(ChatController), nameof(PostMessage));
         }
     }
 }
