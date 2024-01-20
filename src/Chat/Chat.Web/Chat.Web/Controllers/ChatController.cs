@@ -28,20 +28,41 @@ public class ChatController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ChatMessage>>> GetMessages()
     {
-        return await _context.ChatMessages.ToListAsync();
+        try
+        {
+            var randomError = new Random().Next(0, 100);
+            if (randomError > 90)
+            {
+                throw new Exception("Random error");
+            }
+            return await _context.ChatMessages.ToListAsync();
+        }
+        catch
+        {
+            DiagnosticConfig.TrackControllerError(nameof(ChatController), nameof(GetMessages));
+            throw;
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<ChatMessage>> PostMessage(ChatMessage message)
     {
-        _context.ChatMessages.Add(message);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _context.ChatMessages.Add(message);
+            await _context.SaveChangesAsync();
 
-        _logger.LogInformation("Message posted by {UserName} at {CreatedAt}", message.UserName, message.CreatedAt);
-        _sentMessages.Add(1);
+            _logger.LogInformation("Message posted by {UserName} at {CreatedAt}", message.UserName, message.CreatedAt);
+            _sentMessages.Add(1);
 
-        _userActivityTracker.TrackUserActivity(message);
+            _userActivityTracker.TrackUserActivity(message);
 
-        return Created();
+            return Created();
+        }
+        catch
+        {
+            DiagnosticConfig.TrackControllerError(nameof(ChatController), nameof(PostMessage));
+            throw;
+        }
     }
 }

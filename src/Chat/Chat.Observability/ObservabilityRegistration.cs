@@ -31,6 +31,8 @@ public static class ObservabilityRegistration
 
         configuration.GetRequiredSection(nameof(ObservabilityOptions)).Bind(observabilityOptions);
 
+        builder.Services.AddSingleton(observabilityOptions);
+
         builder.Host.AddSerilog();
 
         builder
@@ -56,6 +58,8 @@ public static class ObservabilityRegistration
                 .SetErrorStatusOnException()
                 .SetSampler(new AlwaysOnSampler())
                 .AddNpgsql()
+                .AddEntityFrameworkCoreInstrumentation()
+                .AddHttpClientInstrumentation()
                 .AddAspNetCoreInstrumentation(options =>
                 {
                     options.RecordException = true;
@@ -86,16 +90,20 @@ public static class ObservabilityRegistration
             metrics
                 .AddMeter(
                 meter.Name,
-                "Microsoft.AspNetCore.Hosting",
-                "Microsoft.AspNetCore.Hosting.Metrics",
-                "Microsoft.AspNetCore.Diagnostics",
-                "Microsoft.AspNetCore.HeaderParsing",
-                "Microsoft.Extensions.Diagnostics.HealthChecks",
-                "Microsoft.Extensions.Diagnostics.ResourceMonitoring",
-                "System.Net.Http"
+                DiagnosticsNames.MicrosoftAspNetCoreHosting,
+                DiagnosticsNames.MicrosoftAspNetCoreHostingMetrics,
+                DiagnosticsNames.MicrosoftAspNetCoreDiagnostics,
+                DiagnosticsNames.MicrosoftAspNetCoreHeaderParsing,
+                DiagnosticsNames.MicrosoftExtensionsDiagnosticsHealthChecks,
+                DiagnosticsNames.MicrosoftExtensionsDiagnosticsResourceMonitoring,
+                DiagnosticsNames.SystemNetHttp
                 )
                 .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(meter.Name))
-                .AddAspNetCoreInstrumentation();
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddProcessInstrumentation()
+                .AddRuntimeInstrumentation()
+                .AddPrometheusExporter();
 
             metrics.AddOtlpExporter(options =>
             {

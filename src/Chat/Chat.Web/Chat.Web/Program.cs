@@ -35,6 +35,8 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
