@@ -60,7 +60,7 @@ services:
     volumes:
       - ../shared/config-files/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
       - ../shared/config-files/grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/default.yaml
-      - ./dashboards:/var/lib/grafana/dashboards
+      - ../shared/dashboards:/var/lib/grafana/dashboards
       - ./config-files/grafana.ini:/etc/grafana/grafana.ini
     depends_on:
       - tempo
