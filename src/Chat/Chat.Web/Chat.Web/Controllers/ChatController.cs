@@ -15,7 +15,7 @@ public class ChatController : ControllerBase
     private readonly Meter _meter;
     private readonly Counter<int> _sentMessages;
     private readonly UserActivityTracker _userActivityTracker;
-    
+
     public ChatController(ChatDbContext context, ILogger<ChatController> logger, Meter meter)
     {
         _context = context;
@@ -36,10 +36,10 @@ public class ChatController : ControllerBase
     {
         _context.ChatMessages.Add(message);
         await _context.SaveChangesAsync();
-        
+
         _logger.LogInformation("Message posted by {UserName} at {CreatedAt}", message.UserName, message.CreatedAt);
         _sentMessages.Add(1);
-        
+
         _userActivityTracker.TrackUserActivity(message);
 
         return Created();

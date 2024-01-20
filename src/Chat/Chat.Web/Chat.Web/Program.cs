@@ -30,7 +30,7 @@ public class Program
         builder.Services.AddControllers();
 
         builder.AddObservability();
-        
+
         builder.Services.AddSingleton<UserActivityTracker>();
 
         var app = builder.Build();

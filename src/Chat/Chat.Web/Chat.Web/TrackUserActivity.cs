@@ -8,7 +8,7 @@ public class UserActivityTracker
     private readonly HashSet<string> _activeUsers = [];
     private DateTime _lastUpdate = DateTime.UtcNow.Date;
     private readonly Counter<int> _dailyActiveUsersCounter;
-    
+
     public UserActivityTracker(Meter meter)
     {
         _dailyActiveUsersCounter = meter.CreateCounter<int>("chatapi.daily_active_users", null, "Number of active users per day");
