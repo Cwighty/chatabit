@@ -474,7 +474,7 @@
           "options": {
             "alias": "Memory Usage MB",
             "binary": {
-              "left": "{__name__=\"process_memory_usage_bytes\", exported_instance=\"0e9d7637-0669-4de0-96fa-8d593ea9d2b9\", exported_job=\"ChatApi\", group=\"otel-collector\", instance=\"collector:8889\", job=\"prometheus\"}",
+              "left": "{__name__=\"process_memory_usage_bytes\", exported_instance=\"369533fd-6912-472b-a1dc-5b61a48cfcbe\", exported_job=\"ChatApi\", group=\"otel-collector\", instance=\"collector:8889\", job=\"prometheus\"}",
               "operator": "/",
               "right": "1000000"
             },
@@ -493,7 +493,7 @@
           "options": {
             "alias": "Current Usage MB",
             "binary": {
-              "left": "process_memory_usage_bytes {__name__=\"process_memory_usage_bytes\", exported_instance=\"0e9d7637-0669-4de0-96fa-8d593ea9d2b9\", exported_job=\"ChatApi\", group=\"otel-collector\", instance=\"collector:8889\", job=\"prometheus\"}",
+              "left": "process_memory_usage_bytes {__name__=\"process_memory_usage_bytes\", exported_instance=\"369533fd-6912-472b-a1dc-5b61a48cfcbe\", exported_job=\"ChatApi\", group=\"otel-collector\", instance=\"collector:8889\", job=\"prometheus\"}",
               "operator": "/",
               "right": "1000000"
             },
@@ -522,6 +522,6 @@
   "timezone": "",
   "title": "Questions",
   "uid": "f9047259-cdb9-4636-b322-2d7981896efd",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }
