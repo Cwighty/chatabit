@@ -13,8 +13,7 @@ scrape_configs:
     follow_redirects: true
     static_configs:
       - targets:
-          # - collector:8889
-          # - collector:8888
-          - dc-chat:8080
+          - collector:8889
+          - collector:8888
         labels:
           group: otel-collector

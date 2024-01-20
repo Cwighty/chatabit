@@ -42,6 +42,10 @@ public class ChatController : ControllerBase
             DiagnosticConfig.TrackControllerError(nameof(ChatController), nameof(GetMessages));
             throw;
         }
+        finally
+        {
+            DiagnosticConfig.TrackControllerCall(nameof(ChatController), nameof(GetMessages));
+        }
     }
 
     [HttpPost]
@@ -63,6 +67,10 @@ public class ChatController : ControllerBase
         {
             DiagnosticConfig.TrackControllerError(nameof(ChatController), nameof(PostMessage));
             throw;
+        }
+        finally
+        {
+            DiagnosticConfig.TrackControllerCall(nameof(ChatController), nameof(GetMessages));
         }
     }
 }
