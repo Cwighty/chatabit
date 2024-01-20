@@ -13,7 +13,7 @@ public static class DiagnosticConfig
 
     public static void TrackControllerError(string controllerName, string actionName)
     {
-        ControllerErrorCounter.Add(1, 
+        ControllerErrorCounter.Add(1,
             new KeyValuePair<string, object?>("controller", controllerName),
             new KeyValuePair<string, object?>("action", actionName)
             );
@@ -21,7 +21,7 @@ public static class DiagnosticConfig
 
     public static void TrackControllerCall(string controllerName, string actionName)
     {
-        ControllerCallCounter.Add(1, 
+        ControllerCallCounter.Add(1,
                    new KeyValuePair<string, object?>("controller", controllerName),
                    new KeyValuePair<string, object?>("action", actionName)
                  );

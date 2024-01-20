@@ -60,7 +60,7 @@ public class Program
             .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(typeof(Chat.Web.Client.Pages.Counter).Assembly);
 
-        app.MapHealthChecks("/health"); 
+        app.MapHealthChecks("/health");
         app.MapControllers();
 
         app.Run();
