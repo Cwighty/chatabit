@@ -1,0 +1,41 @@
+﻿﻿@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+
+<div>
+    <InputFile OnChange="@HandleFileSelection" />
+    @if (imageDataUrl != null)
+    {
+        <img src="@imageDataUrl" alt="uploaded image" style="max-width: 200px" />
+    }
+</div>
+
+@code {
+    private string imageDataUrl;
+
+    [Parameter]
+    public byte[] ImageDataBytes { get; set; }
+    [Parameter]
+    public EventCallback<byte[]> ImageDataBytesChanged { get; set; }
+
+    private async Task HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        // Check file type and size
+        if (!file.ContentType.StartsWith("image/") || file.Size > 2000000)
+        {
+            return;
+        }
+
+        const long MAXALLOWEDSIZE = 1024 * 100;
+        // Convert image to base64 string
+        using (var stream = file.OpenReadStream(MAXALLOWEDSIZE))
+        using (var ms = new MemoryStream())
+        {
+            await stream.CopyToAsync(ms);
+            ImageDataBytes = ms.ToArray();
+            await ImageDataBytesChanged.InvokeAsync(ImageDataBytes);
+            imageDataUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(ImageDataBytes)}";
+        }
+    }
+}
