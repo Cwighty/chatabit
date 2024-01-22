@@ -1,6 +1,7 @@
 @page "/Chat"
 @using global::Chat.Data.Entities
 @using Chat.Web.Client.Components
+@using Chat.Data.Features.Chat
 @inject HttpClient HttpClient
 
 <div class="container">
@@ -27,35 +28,56 @@
     </div>
 
     <div class="form-group mb-2">
-        <label>Username</label>
-        <InputText @bind-Value="username" class="form-control"/>
-    </div>
-    <div class="form-group mb-2">
-        <label>Message</label>
-        <ImageUploader ImageDataBytes="newImageBytes" />
-        <InputText @bind-Value="message" class="form-control"/>
+            <label>Username</label>
+            <InputText @bind-Value="username" class="form-control"/>
+        </div>
+        <div class="form-group mb-2">
+            <label>Message</label>
+            <InputText @bind-Value="message" class="form-control"/>
+        </div>
+        <div class="form-group mb-2">
+            <label>Upload Images</label>
+            <InputFile multiple OnChange="HandleSelectedFiles"/>
+        </div>
         <button @onclick="SendMessage" class="btn btn-primary mt-3">Send</button>
     </div>
-</div>
+
 
 
 @code {
     private string message = "";
     private string username = "";
-    private List<ChatMessage>? Messages { get; set; } = new();
-    private byte[] newImageBytes;
+    private List<ChatMessageResponse>? Messages { get; set; } = new();
+    private List<MemoryStream> uploadedImages = new List<MemoryStream>(); 
 
     protected override async Task OnInitializedAsync()
     {
         await LoadMessages();
     }
 
+    private async Task LoadMessages()
+    {
+        var messages = await HttpClient.GetFromJsonAsync<List<ChatMessageResponse>>("api/chat");
+        messages?.Reverse();
+        Messages = messages;
+    }
+    private void HandleSelectedFiles(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            var memoryStream = new MemoryStream();
+            file.OpenReadStream().CopyTo(memoryStream);
+            uploadedImages.Add(memoryStream);
+        }
+    }
+
     private async Task SendMessage()
     {
-        var chatMessage = new ChatMessage
+        var chatMessage = new NewChatMessageRequest()
         {
             MessageText = message,
-            UserName = username
+            UserName = username,
+            Images = uploadedImages.Select(ms => ms.ToArray()).ToList()
         };
 
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
@@ -63,13 +85,6 @@
         await LoadMessages();
 
         message = "";
+        uploadedImages.Clear();
     }
-
-    private async Task LoadMessages()
-    {
-        var messages = await HttpClient.GetFromJsonAsync<List<ChatMessage>>("api/chat");
-        messages?.Reverse();
-        Messages = messages;
-    }
-
 }

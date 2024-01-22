@@ -1,0 +1,16 @@
+﻿using Chat.Data.Entities;
+
+namespace Chat.Data.Features.Chat;
+
+public static class ChatMessageExtensions
+{
+    public static ChatMessageResponse ToResponseModel(this ChatMessage message, IEnumerable<byte[]> images)
+    {
+        return new ChatMessageResponse
+        {
+            UserName = message.UserName,
+            MessageText = message.MessageText,
+            Images = images,
+        };
+    }
+}

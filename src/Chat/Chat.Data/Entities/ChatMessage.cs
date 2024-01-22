@@ -1,4 +1,7 @@
-﻿namespace Chat.Data.Entities;
+﻿using System;
+using System.Collections.Generic;
+
+namespace Chat.Data.Entities;
 
 public partial class ChatMessage
 {
@@ -9,4 +12,6 @@ public partial class ChatMessage
     public DateTime CreatedAt { get; set; }
 
     public string UserName { get; set; } = null!;
+
+    public virtual ICollection<ChatMessageImage> ChatMessageImages { get; set; } = new List<ChatMessageImage>();
 }

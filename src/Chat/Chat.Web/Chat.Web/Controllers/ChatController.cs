@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.Metrics;
 using Chat.Data;
 using Chat.Data.Entities;
+using Chat.Data.Features.Chat;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,16 +27,17 @@ public class ChatController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ChatMessage>>> GetMessages()
+    public async Task<ActionResult<IEnumerable<ChatMessageResponse>>> GetMessages()
     {
         try
         {
-            var randomError = new Random().Next(0, 100);
-            if (randomError > 90)
-            {
-                throw new Exception("Random error");
-            }
-            return await _context.ChatMessages.ToListAsync();
+            var chatMessages = await _context.ChatMessages
+                .Include(c => c.ChatMessageImages)
+                .ToListAsync();   
+            
+            var images = chatMessages.SelectMany(x => x.ChatMessageImages.Select(y => y.ImageData));
+            
+            return chatMessages.Select(x => x.ToResponseModel(images)).ToList();
         }
         catch
         {
@@ -49,23 +51,32 @@ public class ChatController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ChatMessage>> PostMessage(ChatMessage message)
+    public async Task<ActionResult<ChatMessage>> PostMessage(NewChatMessageRequest request)
     {
         try
         {
-            var randomError = new Random().Next(0, 100);
-            if (randomError > 80)
+            var dbChatMessage = new ChatMessage()
             {
-                throw new Exception("Random error");
-            }
+                MessageText = request.MessageText, UserName = request.UserName, CreatedAt = DateTime.UtcNow,
+            };
 
-            _context.ChatMessages.Add(message);
+            _context.ChatMessages.Add(dbChatMessage);
+            var id = dbChatMessage.Id;
+            
+            var chatMessageImages = request.Images.Select(x => new ChatMessageImage()
+            {
+                ChatMessageId = id,
+                ImageData = x,
+                FileName = Guid.NewGuid().ToString(),
+            });
+            
+            _context.ChatMessageImages.AddRange(chatMessageImages);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Message posted by {UserName} at {CreatedAt}", message.UserName, message.CreatedAt);
+            _logger.LogInformation("Message posted by {UserName} at {CreatedAt}", dbChatMessage.UserName, dbChatMessage.CreatedAt);
             _sentMessages.Add(1);
 
-            _userActivityTracker.TrackUserActivity(message);
+            _userActivityTracker.TrackUserActivity(dbChatMessage);
 
             return Created();
         }

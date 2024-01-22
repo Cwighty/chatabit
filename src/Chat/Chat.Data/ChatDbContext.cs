@@ -14,6 +14,8 @@ public partial class ChatDbContext : DbContext
 
     public virtual DbSet<ChatMessage> ChatMessages { get; set; }
 
+    public virtual DbSet<ChatMessageImage> ChatMessageImages { get; set; }
+
     public virtual DbSet<Person> People { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -31,6 +33,23 @@ public partial class ChatDbContext : DbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.MessageText).HasColumnName("message_text");
             entity.Property(e => e.UserName).HasColumnName("user_name");
+        });
+
+        modelBuilder.Entity<ChatMessageImage>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("chat_message_image_pkey");
+
+            entity.ToTable("chat_message_image");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ChatMessageId).HasColumnName("chat_message_id");
+            entity.Property(e => e.FileName).HasColumnName("file_name");
+            entity.Property(e => e.ImageData).HasColumnName("image_data");
+
+            entity.HasOne(d => d.ChatMessage).WithMany(p => p.ChatMessageImages)
+                .HasForeignKey(d => d.ChatMessageId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("chat_message_image_chat_message_id_fkey");
         });
 
         modelBuilder.Entity<Person>(entity =>

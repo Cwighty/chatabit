@@ -2,40 +2,48 @@
 @using System.IO
 
 <div>
-    <InputFile OnChange="@HandleFileSelection" />
-    @if (imageDataUrl != null)
+    <InputFile OnChange="@HandleFileSelection" multiple />
+
+    @if (imageDataUrls != null && imageDataUrls.Count > 0)
     {
-        <img src="@imageDataUrl" alt="uploaded image" style="max-width: 200px" />
+        <div>
+            @foreach (var url in imageDataUrls)
+            {
+                <img src="@url" alt="Uploaded image" style="max-width: 200px; margin: 5px;"/>
+            }
+        </div>
     }
 </div>
 
+
 @code {
-    private string imageDataUrl;
+    private List<string> imageDataUrls = new();
+    private List<byte[]> imageBytesList = new();
 
     [Parameter]
-    public byte[] ImageDataBytes { get; set; }
-    [Parameter]
-    public EventCallback<byte[]> ImageDataBytesChanged { get; set; }
+    public EventCallback<List<byte[]>> ImageDataBytesChanged { get; set; }
 
     private async Task HandleFileSelection(InputFileChangeEventArgs e)
     {
-        var file = e.File;
-
-        // Check file type and size
-        if (!file.ContentType.StartsWith("image/") || file.Size > 2000000)
+        const long MAXALLOWEDSIZE = 1024 * 100; // Max size per file
+        foreach (var file in e.GetMultipleFiles())
         {
-            return;
-        }
+            // Check file type and size
+            if (!file.ContentType.StartsWith("image/") || file.Size > 2000000)
+            {
+                continue; // Skip invalid files
+            }
 
-        const long MAXALLOWEDSIZE = 1024 * 100;
-        // Convert image to base64 string
-        using (var stream = file.OpenReadStream(MAXALLOWEDSIZE))
-        using (var ms = new MemoryStream())
-        {
-            await stream.CopyToAsync(ms);
-            ImageDataBytes = ms.ToArray();
-            await ImageDataBytesChanged.InvokeAsync(ImageDataBytes);
-            imageDataUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(ImageDataBytes)}";
+            using (var stream = file.OpenReadStream(MAXALLOWEDSIZE))
+            using (var ms = new MemoryStream())
+            {
+                await stream.CopyToAsync(ms);
+                var bytes = ms.ToArray();
+                imageBytesList.Add(bytes);
+                var imageDataUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
+                imageDataUrls.Add(imageDataUrl);
+            }
         }
+        await ImageDataBytesChanged.InvokeAsync(imageBytesList);
     }
 }
