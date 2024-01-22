@@ -6,7 +6,7 @@ public class ChatMessageResponse
 
     public string MessageText { get; set; } = null!;
 
-    public IEnumerable<byte[]> Images { get; set; } = [];
+    public IEnumerable<string> Images { get; set; } = [];
     
     public DateTime CreatedAt { get; set; }
 

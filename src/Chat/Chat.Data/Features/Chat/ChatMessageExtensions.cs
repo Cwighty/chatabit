@@ -4,7 +4,7 @@ namespace Chat.Data.Features.Chat;
 
 public static class ChatMessageExtensions
 {
-    public static ChatMessageResponse ToResponseModel(this ChatMessage message, IEnumerable<byte[]> images)
+    public static ChatMessageResponse ToResponseModel(this ChatMessage message, IEnumerable<string> images)
     {
         return new ChatMessageResponse
         {

@@ -20,8 +20,12 @@
                         <small class="text-muted ml-2">@m.CreatedAt.ToString("g")</small>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">@m.MessageText</p>
-                    </div>
+						@foreach (var img in m.Images)
+						{
+							<img src="@($"data:image/png;base64,{img}")" style="max-width: 100%; height: auto;" />
+						}
+						<p class="card-text">@m.MessageText</p>
+					</div>
                 </div>
             }
         }
@@ -38,6 +42,10 @@
         <div class="form-group mb-2">
             <label>Upload Images</label>
             <InputFile multiple OnChange="HandleSelectedFiles"/>
+		@foreach (var img in uploadedImages)
+		{
+			<img src="@($"data:image/png;base64,{img}")" style="max-width: 100%; height: auto;" />
+		}
         </div>
         <button @onclick="SendMessage" class="btn btn-primary mt-3">Send</button>
     </div>
@@ -48,7 +56,7 @@
     private string message = "";
     private string username = "";
     private List<ChatMessageResponse>? Messages { get; set; } = new();
-    private List<MemoryStream> uploadedImages = new List<MemoryStream>(); 
+    private List<string> uploadedImages = []; 
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,24 +69,27 @@
         messages?.Reverse();
         Messages = messages;
     }
-    private void HandleSelectedFiles(InputFileChangeEventArgs e)
-    {
-        foreach (var file in e.GetMultipleFiles())
-        {
-            var memoryStream = new MemoryStream();
-            file.OpenReadStream().CopyTo(memoryStream);
-            uploadedImages.Add(memoryStream);
-        }
-    }
+
+	private void HandleSelectedFiles(InputFileChangeEventArgs e)
+	{
+		foreach (var file in e.GetMultipleFiles())
+		{
+			var memoryStream = new MemoryStream();
+			file.OpenReadStream().CopyTo(memoryStream);
+			var bytes = memoryStream.ToArray();
+			var base64String = Convert.ToBase64String(bytes);
+			uploadedImages.Add(base64String);
+		}
+	}
 
     private async Task SendMessage()
     {
-        var chatMessage = new NewChatMessageRequest()
-        {
-            MessageText = message,
-            UserName = username,
-            Images = uploadedImages.Select(ms => ms.ToArray()).ToList()
-        };
+		var chatMessage = new NewChatMessageRequest()
+			{
+				MessageText = message,
+				UserName = username,
+				Images = uploadedImages
+			};
 
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
 

@@ -58,7 +58,7 @@ public class Program
 
         app.MapRazorComponents<App>()
             .AddInteractiveWebAssemblyRenderMode()
-            .AddAdditionalAssemblies(typeof(Chat.Web.Client.Pages.Counter).Assembly);
+            .AddAdditionalAssemblies(typeof(Chat.Web.Client.Pages.Home).Assembly);
 
         app.MapHealthChecks("/health");
         app.MapControllers();

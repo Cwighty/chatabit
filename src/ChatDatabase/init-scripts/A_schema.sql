@@ -16,7 +16,7 @@ create table chat_message (
 create table chat_message_image (
     id serial primary key,
     chat_message_id integer not null,
-    image_data bytea not null,
+    image_data text not null,
     file_name text not null,
     foreign key (chat_message_id) references chat_message(id)
 );

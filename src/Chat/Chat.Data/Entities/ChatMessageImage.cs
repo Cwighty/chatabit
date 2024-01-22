@@ -9,7 +9,7 @@ public partial class ChatMessageImage
 
     public int ChatMessageId { get; set; }
 
-    public byte[] ImageData { get; set; } = null!;
+    public string ImageData { get; set; } = null!;
 
     public string FileName { get; set; } = null!;
 

@@ -57,19 +57,23 @@ public class ChatController : ControllerBase
         {
             var dbChatMessage = new ChatMessage()
             {
-                MessageText = request.MessageText, UserName = request.UserName, CreatedAt = DateTime.UtcNow,
+                MessageText = request.MessageText,
+                UserName = request.UserName,
+                CreatedAt = DateTime.Now,
             };
 
-            _context.ChatMessages.Add(dbChatMessage);
+            await _context.ChatMessages.AddAsync(dbChatMessage);
+            await _context.SaveChangesAsync();
+
             var id = dbChatMessage.Id;
-            
-            var chatMessageImages = request.Images.Select(x => new ChatMessageImage()
+
+            var chatMessageImages = request.Images.Select(img => new ChatMessageImage()
             {
                 ChatMessageId = id,
-                ImageData = x,
+                ImageData = img, 
                 FileName = Guid.NewGuid().ToString(),
             });
-            
+
             _context.ChatMessageImages.AddRange(chatMessageImages);
             await _context.SaveChangesAsync();
 
@@ -78,12 +82,13 @@ public class ChatController : ControllerBase
 
             _userActivityTracker.TrackUserActivity(dbChatMessage);
 
-            return Created();
+            return Ok();
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error posting message");
             DiagnosticConfig.TrackControllerError(nameof(ChatController), nameof(PostMessage));
-            throw;
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
         finally
         {

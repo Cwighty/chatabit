@@ -7,6 +7,6 @@ public class NewChatMessageRequest
 
     public string MessageText { get; set; } = null!;
 
-    public List<byte[]> Images { get; set; } = [];
+    public List<string> Images { get; set; } = [];
 
 }
