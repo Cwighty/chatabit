@@ -31,4 +31,5 @@ jobs:
           cd ops/prod
           docker compose pull
           docker compose build
+          docker compose down
           docker compose up -d
