@@ -150,7 +150,8 @@ public static class ObservabilityRegistration
                     {
                         { "service.name", observabilityOptions.ServiceName },
                     };
-                });
+                })
+                .WriteTo.Console();
             }
         );
         return hostBuilder;
