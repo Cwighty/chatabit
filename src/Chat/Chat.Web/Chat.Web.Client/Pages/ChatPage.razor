@@ -50,6 +50,12 @@
         </div>
     </div>
     <button @onclick="SendMessage" class="btn btn-primary mt-3">Send</button>
+    @if (isBusy)
+    {
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Sending...</span>
+        </div>
+    }
 </div>
 
 
@@ -58,6 +64,7 @@
     private string username = "";
     private List<ChatMessageResponse>? Messages { get; set; } = new();
     private List<string> uploadedImages = [];
+    private bool isBusy = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,7 +89,7 @@
 
     private async Task<string> ConvertFileToBase64(IBrowserFile file)
     {
-        const long MAXALLOWEDSIZE = 1024 * 100; // Max size per file
+        const long MAXALLOWEDSIZE = 100000000; // Max size per file 100 mb
         var arrayBuffer = new byte[file.Size];
         await file.OpenReadStream(maxAllowedSize: MAXALLOWEDSIZE).ReadAsync(arrayBuffer);
         var base64String = Convert.ToBase64String(arrayBuffer);
@@ -91,6 +98,7 @@
 
     private async Task SendMessage()
     {
+        isBusy = true;
         var chatMessage = new NewChatMessageRequest()
         {
             MessageText = message,
@@ -98,7 +106,10 @@
             Images = uploadedImages
         };
 
+
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
+
+        isBusy = false;
 
         await LoadMessages();
 
