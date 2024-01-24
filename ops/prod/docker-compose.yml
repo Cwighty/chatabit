@@ -48,4 +48,4 @@ services:
     restart: unless-stopped
 
   volumes:
-    - dc_chatdb_data:
+    dc_chatdb_data:
