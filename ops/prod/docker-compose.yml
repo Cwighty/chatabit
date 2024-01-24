@@ -21,8 +21,6 @@ services:
     build:
       context: ../../src/Chat/
       dockerfile: Chat.Web/Chat.Web/Dockerfile
-    ports:
-      - 9000:8080
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ApiBaseAddress=https://chatabit.duckdns.org:1234
