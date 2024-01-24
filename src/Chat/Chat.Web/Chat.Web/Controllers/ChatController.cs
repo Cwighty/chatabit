@@ -33,8 +33,8 @@ public class ChatController : ControllerBase
         {
             var chatMessages = await _context.ChatMessages
                 .Include(c => c.ChatMessageImages)
-                .ToListAsync();   
-            
+                .ToListAsync();
+
             return chatMessages.Select(x => x.ToResponseModel()).ToList();
         }
         catch
@@ -68,7 +68,7 @@ public class ChatController : ControllerBase
             var chatMessageImages = request.Images.Select(img => new ChatMessageImage()
             {
                 ChatMessageId = id,
-                ImageData = img, 
+                ImageData = img,
                 FileName = Guid.NewGuid().ToString(),
             });
 
