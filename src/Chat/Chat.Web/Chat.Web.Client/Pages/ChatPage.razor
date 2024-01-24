@@ -70,17 +70,22 @@
         Messages = messages;
     }
 
-	private void HandleSelectedFiles(InputFileChangeEventArgs e)
-	{
-		foreach (var file in e.GetMultipleFiles())
-		{
-			var memoryStream = new MemoryStream();
-			file.OpenReadStream().CopyTo(memoryStream);
-			var bytes = memoryStream.ToArray();
-			var base64String = Convert.ToBase64String(bytes);
-			uploadedImages.Add(base64String);
-		}
-	}
+    private async Task HandleSelectedFiles(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            var base64String = await ConvertFileToBase64(file);
+            uploadedImages.Add(base64String);
+        }
+    }
+
+    private async Task<string> ConvertFileToBase64(IBrowserFile file)
+    {
+        var arrayBuffer = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(arrayBuffer);
+        var base64String = Convert.ToBase64String(arrayBuffer);
+        return base64String;
+    }
 
     private async Task SendMessage()
     {
