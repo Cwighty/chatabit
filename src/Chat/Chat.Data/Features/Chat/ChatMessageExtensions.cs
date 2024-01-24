@@ -11,6 +11,7 @@ public static class ChatMessageExtensions
             UserName = message.UserName,
             MessageText = message.MessageText,
             Images = message.ChatMessageImages.Select(x => x.ImageData).ToList(),
+            CreatedAt = message.CreatedAt,
         };
     }
 }
