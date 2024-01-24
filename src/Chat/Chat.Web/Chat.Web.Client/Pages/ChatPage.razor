@@ -32,16 +32,23 @@
     </div>
 
     <div class="form-group mb-2">
-        <label>Username</label>
-        <InputText @bind-Value="username" class="form-control"/>
-    </div>
-    <div class="form-group mb-2">
         <label>Message</label>
-        <InputText @bind-Value="message" class="form-control"/>
+        <InputTextArea @bind-Value="message" class="form-control"/>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-9">
+            <div class="form-group">
+                <label>Username</label>
+                <InputText @bind-Value="username" class="form-control"/>
+            </div>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button @onclick="SendMessage" class="btn btn-primary w-100">Send</button>
+        </div>
     </div>
     <div class="form-group mb-2">
         <label>Upload Images</label>
-        <InputFile multiple OnChange="HandleSelectedFiles"/>
+        <InputFile multiple OnChange="HandleSelectedFiles" @key="inputFileId"/>
         <div class="flex-row">
             @foreach (var img in uploadedImages)
             {
@@ -49,7 +56,6 @@
             }
         </div>
     </div>
-    <button @onclick="SendMessage" class="btn btn-primary mt-3">Send</button>
 </div>
 
 
@@ -58,6 +64,7 @@
     private string username = "";
     private List<ChatMessageResponse>? Messages { get; set; } = new();
     private List<string> uploadedImages = [];
+    private Guid? inputFileId = Guid.NewGuid();
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,6 +111,6 @@
 
         message = "";
         uploadedImages.Clear();
+        inputFileId = Guid.NewGuid();
     }
-
 }
