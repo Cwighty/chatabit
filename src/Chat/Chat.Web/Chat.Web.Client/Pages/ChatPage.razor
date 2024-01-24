@@ -5,7 +5,7 @@
 
 <div class="container">
     <div style="display: flex; flex-direction: column-reverse; max-height: 500px; overflow: auto">
-        @if (Messages == null)
+        @if (Messages == null | isLoading)
         {
             <em>Loading...</em>
         }
@@ -30,36 +30,36 @@
         }
     </div>
 
-    <div class="form-group mb-2">
-        <label>Message</label>
-        <InputTextArea @bind-Value="message" class="form-control"/>
-    </div>
-    <div class="row mb-2">
-        <div class="col-md-9">
-            <div class="form-group">
-                <label>Username</label>
-                <InputText @bind-Value="username" class="form-control"/>
-            </div>
-        </div>
-        <div class="col-md-3 d-flex align-items-end">
-            <button @onclick="SendMessage" class="btn btn-primary w-100">Send</button>
-        </div>
-    </div>
-    <div class="form-group mb-2">
-        <label>Upload Images</label>
-        <InputFile multiple OnChange="HandleSelectedFiles" @key="inputFileId"/>
-        <div class="flex-row">
-            @foreach (var img in uploadedImages)
-            {
-                <img src="@($"data:image/png;base64,{img}")" style="max-width: 30%; height: auto;"/>
-            }
-        </div>
-    </div>
-    <button @onclick="SendMessage" class="btn btn-primary mt-3">Send</button>
     @if (isBusy)
     {
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Sending...</span>
+        <em>Sending...</em>
+    }
+    else
+    {
+        <div class="form-group mb-2">
+            <label>Message</label>
+            <InputTextArea @bind-Value="message" class="form-control"/>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-9">
+                <div class="form-group">
+                    <label>Username</label>
+                    <InputText @bind-Value="username" class="form-control"/>
+                </div>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button @onclick="SendMessage" class="btn btn-primary w-100">Send</button>
+            </div>
+        </div>
+        <div class="form-group mb-2">
+            <label>Upload Images</label>
+            <InputFile multiple OnChange="HandleSelectedFiles" @key="inputFileId"/>
+            <div class="flex-row">
+                @foreach (var img in uploadedImages)
+                {
+                    <img src="@($"data:image/png;base64,{img}")" style="max-width: 30%; height: auto;"/>
+                }
+            </div>
         </div>
     }
 </div>
@@ -71,6 +71,7 @@
     private List<ChatMessageResponse>? Messages { get; set; } = new();
     private List<string> uploadedImages = [];
     private bool isBusy = false;
+    private bool isLoading = false;
     private Guid? inputFileId = Guid.NewGuid();
 
     protected override async Task OnInitializedAsync()
@@ -80,9 +81,11 @@
 
     private async Task LoadMessages()
     {
+        isLoading = true;
         var messages = await HttpClient.GetFromJsonAsync<List<ChatMessageResponse>>("api/chat");
         messages?.Reverse();
         Messages = messages;
+        isLoading = false;
     }
 
     private async Task HandleSelectedFiles(InputFileChangeEventArgs e)
@@ -112,7 +115,6 @@
             UserName = username,
             Images = uploadedImages
         };
-
 
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
 
