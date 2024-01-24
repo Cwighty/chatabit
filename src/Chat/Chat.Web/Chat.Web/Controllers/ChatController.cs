@@ -35,9 +35,7 @@ public class ChatController : ControllerBase
                 .Include(c => c.ChatMessageImages)
                 .ToListAsync();   
             
-            var images = chatMessages.SelectMany(x => x.ChatMessageImages.Select(y => y.ImageData));
-            
-            return chatMessages.Select(x => x.ToResponseModel(images)).ToList();
+            return chatMessages.Select(x => x.ToResponseModel()).ToList();
         }
         catch
         {

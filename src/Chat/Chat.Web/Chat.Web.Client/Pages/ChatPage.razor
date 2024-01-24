@@ -20,43 +20,44 @@
                         <small class="text-muted ml-2">@m.CreatedAt.ToString("g")</small>
                     </div>
                     <div class="card-body">
-						@foreach (var img in m.Images)
-						{
-							<img src="@($"data:image/png;base64,{img}")" style="max-width: 100%; height: auto;" />
-						}
-						<p class="card-text">@m.MessageText</p>
-					</div>
+                        @foreach (var img in m.Images)
+                        {
+                            <img src="@($"data:image/png;base64,{img}")" style="max-width: 30%; height: auto;"/>
+                        }
+                        <p class="card-text">@m.MessageText</p>
+                    </div>
                 </div>
             }
         }
     </div>
 
     <div class="form-group mb-2">
-            <label>Username</label>
-            <InputText @bind-Value="username" class="form-control"/>
-        </div>
-        <div class="form-group mb-2">
-            <label>Message</label>
-            <InputText @bind-Value="message" class="form-control"/>
-        </div>
-        <div class="form-group mb-2">
-            <label>Upload Images</label>
-            <InputFile multiple OnChange="HandleSelectedFiles"/>
-		@foreach (var img in uploadedImages)
-		{
-			<img src="@($"data:image/png;base64,{img}")" style="max-width: 100%; height: auto;" />
-		}
-        </div>
-        <button @onclick="SendMessage" class="btn btn-primary mt-3">Send</button>
+        <label>Username</label>
+        <InputText @bind-Value="username" class="form-control"/>
     </div>
-
+    <div class="form-group mb-2">
+        <label>Message</label>
+        <InputText @bind-Value="message" class="form-control"/>
+    </div>
+    <div class="form-group mb-2">
+        <label>Upload Images</label>
+        <InputFile multiple OnChange="HandleSelectedFiles"/>
+        <div class="flex-row">
+            @foreach (var img in uploadedImages)
+            {
+                <img src="@($"data:image/png;base64,{img}")" style="max-width: 30%; height: auto;"/>
+            }
+        </div>
+    </div>
+    <button @onclick="SendMessage" class="btn btn-primary mt-3">Send</button>
+</div>
 
 
 @code {
     private string message = "";
     private string username = "";
     private List<ChatMessageResponse>? Messages { get; set; } = new();
-    private List<string> uploadedImages = []; 
+    private List<string> uploadedImages = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,20 +82,21 @@
 
     private async Task<string> ConvertFileToBase64(IBrowserFile file)
     {
+        const long MAXALLOWEDSIZE = 1024 * 100; // Max size per file
         var arrayBuffer = new byte[file.Size];
-        await file.OpenReadStream().ReadAsync(arrayBuffer);
+        await file.OpenReadStream(maxAllowedSize: MAXALLOWEDSIZE).ReadAsync(arrayBuffer);
         var base64String = Convert.ToBase64String(arrayBuffer);
         return base64String;
     }
 
     private async Task SendMessage()
     {
-		var chatMessage = new NewChatMessageRequest()
-			{
-				MessageText = message,
-				UserName = username,
-				Images = uploadedImages
-			};
+        var chatMessage = new NewChatMessageRequest()
+        {
+            MessageText = message,
+            UserName = username,
+            Images = uploadedImages
+        };
 
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
 
@@ -103,4 +105,5 @@
         message = "";
         uploadedImages.Clear();
     }
+
 }

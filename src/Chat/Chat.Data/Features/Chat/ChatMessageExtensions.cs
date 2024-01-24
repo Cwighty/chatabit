@@ -4,13 +4,13 @@ namespace Chat.Data.Features.Chat;
 
 public static class ChatMessageExtensions
 {
-    public static ChatMessageResponse ToResponseModel(this ChatMessage message, IEnumerable<string> images)
+    public static ChatMessageResponse ToResponseModel(this ChatMessage message)
     {
         return new ChatMessageResponse
         {
             UserName = message.UserName,
             MessageText = message.MessageText,
-            Images = images,
+            Images = message.ChatMessageImages.Select(x => x.ImageData).ToList(),
         };
     }
 }

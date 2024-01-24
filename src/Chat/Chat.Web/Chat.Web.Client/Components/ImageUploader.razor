@@ -29,7 +29,7 @@
         foreach (var file in e.GetMultipleFiles())
         {
             // Check file type and size
-            if (!file.ContentType.StartsWith("image/") || file.Size > 2000000)
+            if (!file.ContentType.StartsWith("image/") || file.Size > MAXALLOWEDSIZE)
             {
                 continue; // Skip invalid files
             }
