@@ -12,7 +12,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - dc_chatdb_data:/var/lib/postgresql/data
+      - dc-postgres-data:/var/lib/postgresql/data
       - ../src/ChatDatabase/init-scripts:/docker-entrypoint-initdb.d
     restart: always
 
@@ -46,6 +46,3 @@ services:
     ports:
       - 0.0.0.0:1234:443
     restart: unless-stopped
-
-  volumes:
-    dc_chatdb_data:

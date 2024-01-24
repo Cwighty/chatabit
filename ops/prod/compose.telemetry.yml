@@ -72,3 +72,4 @@ volumes:
   dc-loki-data:
   dc-tempo-data:
   dc-prometheus-data:
+  dc-postgres-data:
