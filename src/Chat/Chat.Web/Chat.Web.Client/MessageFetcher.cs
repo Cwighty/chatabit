@@ -1,5 +1,5 @@
-﻿using Chat.Data.Features.Chat;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
+using Chat.Data.Features.Chat;
 
 namespace Chat.Web.Client;
 

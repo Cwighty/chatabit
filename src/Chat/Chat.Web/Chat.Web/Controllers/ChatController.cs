@@ -1,12 +1,12 @@
-﻿using System.Diagnostics.Metrics;
+﻿using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using Chat.Data;
 using Chat.Data.Entities;
 using Chat.Data.Features.Chat;
+using Chat.Observability.Options;
+using ImageMagick;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ImageMagick;
-using Chat.Observability.Options;
-using System.Diagnostics;
 
 namespace Chat.Web.Controllers;
 
