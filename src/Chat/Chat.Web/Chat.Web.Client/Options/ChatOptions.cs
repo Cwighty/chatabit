@@ -2,6 +2,6 @@
 
 public class ChatOptions
 {
-    public int PollingIntervalMilliseconds { get; set; } = 10000;
+    public int PollingIntervalMilliseconds { get; set; } = 40000;
 
 }

@@ -8,7 +8,7 @@
 @inject MessageFetcher mfer;
 
 <div class="container">
-    <div style="display: flex; flex-direction: column-reverse; max-height: 500px; overflow: auto">
+    <div class="border border-1 p-1" style="display: flex; flex-direction: column-reverse; height: 500px; overflow: auto">
         @if (Messages == null | isLoading)
         {
             <em>Loading...</em>
