@@ -1,7 +1,11 @@
 @page "/Chat"
+@using Chat.Web.Client.Options
 @using global::Chat.Data.Entities
 @using Chat.Data.Features.Chat
+@using System.Threading
+@inject ChatOptions options
 @inject HttpClient HttpClient
+@inject MessageFetcher mfer;
 
 <div class="container">
     <div style="display: flex; flex-direction: column-reverse; max-height: 500px; overflow: auto">
@@ -69,23 +73,29 @@
     private string message = "";
     private string username = "";
     private List<ChatMessageResponse>? Messages { get; set; } = new();
-    private List<string> uploadedImages = [];
+    private List<string> uploadedImages = new List<string>();
     private bool isBusy = false;
     private bool isLoading = false;
     private Guid? inputFileId = Guid.NewGuid();
+    private Timer? pollingTimer;
+    private bool isDisposed = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await LoadMessages();
+        mfer.OnMessagesUpdated += UpdateMessages;
+        mfer.StartFetchingMessages(TimeSpan.FromMilliseconds(options.PollingIntervalMilliseconds));
     }
 
-    private async Task LoadMessages()
+    private void UpdateMessages(List<ChatMessageResponse> messages)
     {
-        isLoading = true;
-        var messages = await HttpClient.GetFromJsonAsync<List<ChatMessageResponse>>("api/chat");
-        messages?.Reverse();
         Messages = messages;
-        isLoading = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        mfer.OnMessagesUpdated -= UpdateMessages;
+        mfer.Dispose();
     }
 
     private async Task HandleSelectedFiles(InputFileChangeEventArgs e)
@@ -120,7 +130,7 @@
 
         isBusy = false;
 
-        await LoadMessages();
+        await mfer.FetchMessages();
 
         message = "";
         uploadedImages.Clear();

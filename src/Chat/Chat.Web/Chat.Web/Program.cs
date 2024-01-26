@@ -2,6 +2,8 @@
 using Chat.Observability;
 using Chat.Observability.Options;
 using Chat.Web;
+using Chat.Web.Client;
+using Chat.Web.Client.Options;
 using Chat.Web.Components;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,10 +28,12 @@ public class Program
         builder.Services
             .AddHttpClient("My.ServerAPI", client => client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"] ?? throw new Exception("ApiBaseAddress not found in configuration")));
 
+        builder.Services.AddScoped<MessageFetcher>();
+        builder.Services.AddScoped(sp => new ChatOptions());
+
         builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("My.ServerAPI"));
 
         builder.Services.AddControllers();
-
 
         var configuration = builder.Configuration;
         ChatApiOptions apiOptions = new();

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Metrics;
+﻿using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Security.Cryptography.X509Certificates;
 using Chat.Observability.Options;
 
@@ -26,5 +27,7 @@ public static class DiagnosticConfig
                    new KeyValuePair<string, object?>("action", actionName)
                  );
     }
+
+    public static ActivitySource ActivitySource = new ActivitySource("ChatApi");
 
 }

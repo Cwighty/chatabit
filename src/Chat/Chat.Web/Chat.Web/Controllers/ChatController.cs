@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ImageMagick;
 using Chat.Observability.Options;
+using System.Diagnostics;
 
 namespace Chat.Web.Controllers;
 
@@ -55,75 +56,78 @@ public class ChatController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ChatMessage>> PostMessage(NewChatMessageRequest request)
     {
-        try
+        using (var activity = DiagnosticConfig.ActivitySource.StartActivity("PostMessage"))
         {
-            var dbChatMessage = new ChatMessage()
+            activity?.AddTag("images", request.Images.Count.ToString());
+            try
             {
-                MessageText = request.MessageText,
-                UserName = request.UserName,
-                CreatedAt = DateTime.Now,
-            };
-
-            await _context.ChatMessages.AddAsync(dbChatMessage);
-            await _context.SaveChangesAsync();
-
-            var id = dbChatMessage.Id;
-
-            if (options.CompressImages)
-            {
-                var compressedImages = new List<string>();
-                foreach (var img in request.Images)
+                var dbChatMessage = new ChatMessage()
                 {
-                    var imageData = Convert.FromBase64String(img);
-                    var stream = new MemoryStream(imageData);
+                    MessageText = request.MessageText,
+                    UserName = request.UserName,
+                    CreatedAt = DateTime.Now,
+                };
 
-                    Console.WriteLine(stream.Length);
+                await _context.ChatMessages.AddAsync(dbChatMessage);
+                await _context.SaveChangesAsync();
 
-                    var optimizer = new ImageOptimizer();
-                    optimizer.Compress(stream);
-                    
-                    Console.WriteLine(stream.Length);
+                var id = dbChatMessage.Id;
 
-                    var compressedImage = Convert.ToBase64String(stream.ToArray());
-                    compressedImages.Add(compressedImage);
+                if (options.CompressImages)
+                {
+                    using (var compressionActivity = DiagnosticConfig.ActivitySource.StartActivity("CompressImages"))
+                    {
+                        var compressedImages = new List<string>();
+                        foreach (var img in request.Images)
+                        {
+                            var imageData = Convert.FromBase64String(img);
+                            var stream = new MemoryStream(imageData);
+
+                            var optimizer = new ImageOptimizer();
+                            optimizer.Compress(stream);
+
+                            var compressedImage = Convert.ToBase64String(stream.ToArray());
+                            compressedImages.Add(compressedImage);
+                        }
+                        var chatMessageImages = compressedImages.Select(compressedImg => new ChatMessageImage()
+                        {
+                            ChatMessageId = id,
+                            ImageData = compressedImg,
+                            FileName = Guid.NewGuid().ToString(),
+                        });
+                        _context.ChatMessageImages.AddRange(chatMessageImages);
+                    }
                 }
-                var chatMessageImages = compressedImages.Select(compressedImg => new ChatMessageImage()
+                else
                 {
-                    ChatMessageId = id,
-                    ImageData = compressedImg,
-                    FileName = Guid.NewGuid().ToString(),
-                });
-                _context.ChatMessageImages.AddRange(chatMessageImages);
+                    var chatMessageImages = request.Images.Select(img => new ChatMessageImage()
+                    {
+                        ChatMessageId = id,
+                        ImageData = img,
+                        FileName = Guid.NewGuid().ToString(),
+                    });
+                    _context.ChatMessageImages.AddRange(chatMessageImages);
+                }
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Message posted by {UserName} at {CreatedAt}", dbChatMessage.UserName, dbChatMessage.CreatedAt);
+                _sentMessages.Add(1);
+
+                _userActivityTracker.TrackUserActivity(dbChatMessage);
+
+                return Ok();
             }
-            else
+            catch (Exception ex)
             {
-                var chatMessageImages = request.Images.Select(img => new ChatMessageImage()
-                {
-                    ChatMessageId = id,
-                    ImageData = img,
-                    FileName = Guid.NewGuid().ToString(),
-                });
-                _context.ChatMessageImages.AddRange(chatMessageImages);
+                _logger.LogError(ex, "Error posting message");
+                DiagnosticConfig.TrackControllerError(nameof(ChatController), nameof(PostMessage));
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
-
-            await _context.SaveChangesAsync();
-
-            _logger.LogInformation("Message posted by {UserName} at {CreatedAt}", dbChatMessage.UserName, dbChatMessage.CreatedAt);
-            _sentMessages.Add(1);
-
-            _userActivityTracker.TrackUserActivity(dbChatMessage);
-
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error posting message");
-            DiagnosticConfig.TrackControllerError(nameof(ChatController), nameof(PostMessage));
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
-        finally
-        {
-            DiagnosticConfig.TrackControllerCall(nameof(ChatController), nameof(PostMessage));
+            finally
+            {
+                DiagnosticConfig.TrackControllerCall(nameof(ChatController), nameof(PostMessage));
+            }
         }
     }
 }
