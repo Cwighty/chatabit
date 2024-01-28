@@ -39,7 +39,7 @@ jobs:
               - 'src/Chat/Chat.Web/**'
             # Add other service filters here...
             any_other:
-              - '/**(!src/Chat/Chat.ImageProcessing/**|!src/Chat/Chat.Web/**)'
+              - '**(!src/Chat/Chat.ImageProcessing/**|!src/Chat/Chat.Web/**)'
 
       - name: Set matrix for deployment
         id: set-matrix
