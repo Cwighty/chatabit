@@ -43,6 +43,7 @@ jobs:
               - 'src/Chat/**'
 
       - name: Setup Dotnet
+        if: steps.check_changes.outputs.files-changed == 'true'
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: "8.0"
