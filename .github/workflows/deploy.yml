@@ -35,7 +35,7 @@ jobs:
           filters: |
             imageprocessing:
               - 'Chat.ImageProcessing/**'
-            web:
+            chat:
               - 'Chat.Web/**'
             # Add other service filters here...
             any_other:
@@ -55,7 +55,7 @@ jobs:
               matrix+="{\"service\":\"imageprocessing\"},"
             fi
             if [[ "${{ steps.check_changes.outputs.web }}" == "true" ]]; then
-              matrix+="{\"service\":\"web\"},"
+              matrix+="{\"service\":\"chat\"},"
             fi
             # Remove trailing comma if any service has been added
             matrix=${matrix%,}
@@ -75,11 +75,13 @@ jobs:
       - name: Deploy all services
         if: ${{ matrix.service == 'all' }}
         run: |
-          docker-compose down
-          docker-compose up -d
+          cd ops/prod
+          docker compose down
+          docker compose up -d
 
       - name: Deploy specific service
         if: ${{ matrix.service != 'all' }}
         run: |
-          docker-compose down ${{ matrix.service }}
-          docker-compose up -d ${{ matrix.service }}
+          cd ops/prod
+          docker compose down ${{ matrix.service }}
+          docker compose up -d ${{ matrix.service }}
