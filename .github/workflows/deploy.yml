@@ -19,9 +19,11 @@ jobs:
     needs: format
     uses: ./.github/workflows/test.yml
 
-  deploy:
+  check-changes:
     needs: tests
     runs-on: self-hosted
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v2
 
@@ -33,30 +35,50 @@ jobs:
           filters: |
             imageprocessing:
               - 'Chat.ImageProcessing/**'
-            chat:
+            web:
               - 'Chat.Web/**'
             # Add other service filters here...
-            any_other_changes:
+            any_other:
               - '**'
               - '!Chat.ImageProcessing/**'
               - '!Chat.Web/**'
               # Exclude other service paths here...
 
-      - name: Deploy all services if changes are detected outside service directories
-        if: steps.check_changes.outputs.any_other_changes == 'true'
+      - name: Set matrix for deployment
+        id: set-matrix
         run: |
-          cd ops/prod
+          matrix="{\"include\": ["
+          if (${{ steps.check_changes.outputs.any_other }} == 'true') {
+            matrix+="{\"service\":\"all\"},"
+          } else {
+            if (${{ steps.check_changes.outputs.imageprocessing }} == 'true') {
+              matrix+="{\"service\":\"imageprocessing\"},"
+            }
+            if (${{ steps.check_changes.outputs.web }} == 'true') {
+              matrix+="{\"service\":\"web\"},"
+            }
+            # Add other services as needed
+          }
+          matrix+="]}"
+          echo "::set-output name=matrix::$matrix"
+
+  deploy:
+    needs: check-changes
+    runs-on: self-hosted
+    strategy:
+      fail-fast: false
+      matrix: ${{fromJson(needs.check-changes.outputs.matrix)}}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy all services
+        if: ${{ matrix.service == 'all' }}
+        run: |
           docker-compose down
           docker-compose up -d
 
-      - name: Deploy specific service(s) if only their files have changed
-        if: steps.check_changes.outputs.any_other_changes != 'true'
+      - name: Deploy specific service
+        if: ${{ matrix.service != 'all' }}
         run: |
-          ${# This script assumes each service name matches the keys in the filter above #}
-          for service in imageprocessing web; do # Add other service names here...
-            if [[ ${{ steps.check_changes.outputs[service] }} == 'true' ]]; then
-              cd ops/prod
-              docker-compose down $service
-              docker-compose up -d $service
-            fi
-          done
+          docker-compose down ${{ matrix.service }}
+          docker-compose up -d ${{ matrix.service }}
