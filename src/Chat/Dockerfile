@@ -11,6 +11,7 @@ COPY Chat.Data/*.csproj ./Chat.Data/
 COPY Chat.UnitTests/*.csproj ./Chat.UnitTests/
 COPY Chat.IntegrationTests/*.csproj ./Chat.IntegrationTests/
 COPY Chat.Observability/*.csproj ./Chat.Observability/
+COPY Chat.ImageProcessing/*.csproj ./Chat.ImageProcessing/
 RUN dotnet restore
 
 # Copy everything else and build
