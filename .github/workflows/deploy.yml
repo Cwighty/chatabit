@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
       - name: check for changes outside of Chat.ImageProcessing and Chat.Web
         id: diff_check
