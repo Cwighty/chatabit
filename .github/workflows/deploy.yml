@@ -19,17 +19,44 @@ jobs:
     needs: format
     uses: ./.github/workflows/test.yml
 
-  deploy-application:
+  deploy:
     needs: tests
-    runs-on: [self-hosted]
+    runs-on: self-hosted
     steps:
-      - name: checkout repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
-      - name: redeploy application
+      - name: Check for changes in specific services and other files
+        id: check_changes
+        uses: dorny/paths-filter@v2
+        with:
+          list-files: shell
+          filters: |
+            imageprocessing:
+              - 'Chat.ImageProcessing/**'
+            chat:
+              - 'Chat.Web/**'
+            # Add other service filters here...
+            any_other_changes:
+              - '**'
+              - '!Chat.ImageProcessing/**'
+              - '!Chat.Web/**'
+              # Exclude other service paths here...
+
+      - name: Deploy all services if changes are detected outside service directories
+        if: steps.check_changes.outputs.any_other_changes == 'true'
         run: |
           cd ops/prod
-          docker compose pull
-          docker compose build
-          docker compose down
-          docker compose up -d
+          docker-compose down
+          docker-compose up -d
+
+      - name: Deploy specific service(s) if only their files have changed
+        if: steps.check_changes.outputs.any_other_changes != 'true'
+        run: |
+          ${# This script assumes each service name matches the keys in the filter above #}
+          for service in imageprocessing web; do # Add other service names here...
+            if [[ ${{ steps.check_changes.outputs[service] }} == 'true' ]]; then
+              cd ops/prod
+              docker-compose down $service
+              docker-compose up -d $service
+            fi
+          done
