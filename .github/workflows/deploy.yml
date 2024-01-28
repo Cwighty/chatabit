@@ -46,19 +46,23 @@ jobs:
       - name: Set matrix for deployment
         id: set-matrix
         run: |
-          if [[ "${{ steps.check_changes.outputs.any_other }}" == "true" ]]; then
-            echo "::set-output name=matrix::{\"include\":[{\"service\":\"all\"}]}"
+          matrix="{\"include\":["
+
+          if [[ "${{ steps.check_changes.outputs.imageprocessing }}" == "true" ]]; then
+            matrix+="{\"service\":\"imageprocessing\"},"
+          fi
+          if [[ "${{ steps.check_changes.outputs.web }}" == "true" ]]; then
+            matrix+="{\"service\":\"chat\"},"
+          fi
+
+          # Remove trailing comma if any service has been added
+          matrix=${matrix%,}
+          matrix+="]}"
+
+          # Ensure that the matrix is not an empty string
+          if [[ "$matrix" == "{\"include\":[]}" ]]; then
+            echo "::set-output name=matrix::"
           else
-            matrix="{\"include\":["
-            if [[ "${{ steps.check_changes.outputs.imageprocessing }}" == "true" ]]; then
-              matrix+="{\"service\":\"imageprocessing\"},"
-            fi
-            if [[ "${{ steps.check_changes.outputs.web }}" == "true" ]]; then
-              matrix+="{\"service\":\"chat\"},"
-            fi
-            # Remove trailing comma if any service has been added
-            matrix=${matrix%,}
-            matrix+="]}"
             echo "::set-output name=matrix::$matrix"
           fi
 
