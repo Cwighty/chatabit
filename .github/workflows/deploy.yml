@@ -12,15 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # format:
-  #   uses: ./.github/workflows/format.yml
-
-  # tests:
-  #   needs: format
-  #   uses: ./.github/workflows/test.yml
-
   check-changes:
-    # needs: tests
     runs-on: self-hosted
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -37,9 +29,14 @@ jobs:
               - 'src/Chat/Chat.ImageProcessing/**'
             chat:
               - 'src/Chat/Chat.Web/**'
-            # Add other service filters here...
+            dotnet:
+              - 'src/Chat/**'
             any_other:
-              - '**(!src/Chat/Chat.ImageProcessing/**|!src/Chat/Chat.Web/**)'
+              - 'ops/prod/**'
+              - 'ops/shared/**'
+              - 'src/Chat/Chat.Observability/**'
+              - 'src/Chat/Chat.Data/**'
+              - 'src/ChatDatabase/**'
 
       - name: Set matrix for deployment
         id: set-matrix
@@ -60,8 +57,18 @@ jobs:
             echo "::set-output name=matrix::$matrix"
           fi
 
-  deploy:
+  format:
     needs: check-changes
+    if: ${{ needs.check_changes.outputs.dotnet == 'true' }}
+    uses: ./.github/workflows/format.yml
+
+  tests:
+    needs: [format, check-changes]
+    if: ${{ needs.check_changes.outputs.dotnet == 'true' }}
+    uses: ./.github/workflows/test.yml
+
+  deploy:
+    needs: [check-changes, tests]
     runs-on: self-hosted
     strategy:
       fail-fast: false
