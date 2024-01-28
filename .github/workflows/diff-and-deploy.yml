@@ -26,12 +26,13 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: check for changes in ${{ inputs.folder }}
         id: diff_check
         run: |
-          DIFF=$(git diff --name-only HEAD~1 HEAD -- ./${{ inputs.folder }})
+          LAST_DEPLOYED_COMMIT=$(git describe --tags --abbrev=0)
+          DIFF=$(git diff --name-only $LAST_DEPLOYED_COMMIT HEAD -- ./${{ inputs.folder }})
           if [ -n "$DIFF" ]; then
             echo "::set-output name=changed::true"
           else
@@ -46,4 +47,11 @@ jobs:
             docker compose build ${{ inputs.service }}
             docker compose down ${{ inputs.service }}
             docker compose up -d ${{ inputs.service }}
+          fi
+
+      - name: tag new deployment
+        run: |
+          if [ "${{ steps.diff_check.outputs.changed }}" = "true" ]; then
+            git tag deployed-$(date +%Y%m%d%H%M%S)
+            git push origin --tags
           fi
