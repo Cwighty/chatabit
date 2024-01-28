@@ -1,0 +1,6 @@
+@Chat.ImageProcessing_HostAddress = http://localhost:5211
+
+GET {{Chat.ImageProcessing_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

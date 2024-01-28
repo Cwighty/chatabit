@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.IntegrationTests", "Ch
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Observability", "Chat.Observability\Chat.Observability.csproj", "{20750A66-03CC-4A25-A5C9-10741407CEED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.ImageProcessing", "Chat.ImageProcessing\Chat.ImageProcessing.csproj", "{ECF32DE5-637F-4E0D-B4C6-0562DEBDEACA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{20750A66-03CC-4A25-A5C9-10741407CEED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20750A66-03CC-4A25-A5C9-10741407CEED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20750A66-03CC-4A25-A5C9-10741407CEED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECF32DE5-637F-4E0D-B4C6-0562DEBDEACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECF32DE5-637F-4E0D-B4C6-0562DEBDEACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECF32DE5-637F-4E0D-B4C6-0562DEBDEACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECF32DE5-637F-4E0D-B4C6-0562DEBDEACA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
