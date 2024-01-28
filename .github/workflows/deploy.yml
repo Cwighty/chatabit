@@ -34,14 +34,14 @@ jobs:
           list-files: shell
           filters: |
             imageprocessing:
-              - 'Chat.ImageProcessing/**'
+              - 'src/Chat/Chat.ImageProcessing/**'
             chat:
-              - 'Chat.Web/**'
+              - 'src/Chat/Chat.Web/**'
             # Add other service filters here...
             any_other:
               - '**'
-              - '!Chat.ImageProcessing/**'
-              - '!Chat.Web/**'
+              - '!src/Chat/Chat.ImageProcessing/**'
+              - '!src/Chat/Chat.Web/**'
               # Exclude other service paths here...
 
       - name: Set matrix for deployment
