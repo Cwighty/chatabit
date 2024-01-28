@@ -12,6 +12,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  format:
+    uses: ./.github/workflows/format.yml
+
+  tests:
+    needs: [format]
+    uses: ./.github/workflows/test.yml
+
   check-changes:
     runs-on: self-hosted
     outputs:
@@ -29,8 +36,6 @@ jobs:
               - 'src/Chat/Chat.ImageProcessing/**'
             chat:
               - 'src/Chat/Chat.Web/**'
-            dotnet:
-              - 'src/Chat/**'
             any_other:
               - 'ops/prod/**'
               - 'ops/shared/**'
@@ -56,16 +61,6 @@ jobs:
             matrix+="]}"
             echo "::set-output name=matrix::$matrix"
           fi
-
-  format:
-    needs: check-changes
-    if: ${{ needs.check_changes.outputs.dotnet == 'true' }}
-    uses: ./.github/workflows/format.yml
-
-  tests:
-    needs: [format, check-changes]
-    if: ${{ needs.check_changes.outputs.dotnet == 'true' }}
-    uses: ./.github/workflows/test.yml
 
   deploy:
     needs: [check-changes, tests]
