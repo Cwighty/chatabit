@@ -1,4 +1,4 @@
-using Chat.Observability;
+﻿using Chat.Observability;
 
 public class Program
 {
