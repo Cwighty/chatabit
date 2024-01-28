@@ -81,11 +81,11 @@ jobs:
         run: |
           cd ops/prod
           docker compose down
-          docker compose up -d
+          docker compose up -d --build
 
       - name: Deploy specific service
         if: ${{ matrix.service != 'all' }}
         run: |
           cd ops/prod
           docker compose down ${{ matrix.service }}
-          docker compose up -d ${{ matrix.service }}
+          docker compose up -d --build ${{ matrix.service }}
