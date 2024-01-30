@@ -2,6 +2,7 @@
 using Chat.Observability;
 using Microsoft.EntityFrameworkCore;
 
+namespace Chat.ImageProcessing;
 public class Program
 {
     public static void Main(string[] args)

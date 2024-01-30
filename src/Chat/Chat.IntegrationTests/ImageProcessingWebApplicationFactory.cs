@@ -1,5 +1,5 @@
 ﻿using Chat.Data;
-using Chat.Web;
+using Chat.ImageProcessing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -10,7 +10,7 @@ using Testcontainers.PostgreSql;
 
 namespace Chat.IntegrationTests;
 
-public class ChatApiWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public class ImageProcessingWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     public static string FindProjectRootByMarker()
     {
@@ -27,7 +27,7 @@ public class ChatApiWebApplicationFactory : WebApplicationFactory<Program>, IAsy
 
     private readonly PostgreSqlContainer _dbContainer;
 
-    public ChatApiWebApplicationFactory()
+    public ImageProcessingWebApplicationFactory()
     {
         var directory = FindProjectRootByMarker() + "/ChatDatabase/init-scripts";
         _dbContainer = new PostgreSqlBuilder()

@@ -1,11 +1,12 @@
 ﻿using Chat.Data;
 using Chat.Observability;
 using Chat.Observability.Options;
-using Chat.Web;
 using Chat.Web.Client;
 using Chat.Web.Client.Options;
 using Chat.Web.Components;
 using Microsoft.EntityFrameworkCore;
+
+namespace Chat.Web;
 
 public class Program
 {

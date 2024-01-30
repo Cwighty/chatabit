@@ -10,21 +10,20 @@ namespace Chat.IntegrationTests.ControllerTests
 {
     public class ChatControllerTests
     {
-        public class GetChatMessagesTest : IClassFixture<ChatApiWebApplicationFactory>
-        {
-            private HttpClient httpClient { get; }
-            private readonly ChatApiWebApplicationFactory factory;
+        public class GetChatMessagesTest : IClassFixture<ChatApiWebApplicationFactory>        {
+            private HttpClient chatHttpClient { get; }
+            private readonly ChatApiWebApplicationFactory chatFactory;
 
-            public GetChatMessagesTest(ChatApiWebApplicationFactory factory)
+            public GetChatMessagesTest(ChatApiWebApplicationFactory chatFactory)
             {
-                this.factory = factory;
-                httpClient = factory.CreateClient();
+                this.chatFactory = chatFactory;
+                chatHttpClient = chatFactory.CreateClient();
             }
 
             [Fact]
             public async Task GetChatMessagesTestAsync_ShouldContainAMessage()
             {
-                var scope = factory.Services.GetService<IServiceScopeFactory>()?.CreateScope();
+                var scope = chatFactory.Services.GetService<IServiceScopeFactory>()?.CreateScope();
                 if (scope == null)
                 {
                     throw new InvalidOperationException("Service scope could not be created.");
@@ -46,7 +45,7 @@ namespace Chat.IntegrationTests.ControllerTests
                 dbContext.ChatMessages.Add(chatMessage);
                 await dbContext.SaveChangesAsync();
 
-                var response = await httpClient.GetAsync("/api/Chat/");
+                var response = await chatHttpClient.GetAsync("/api/Chat/");
                 response.EnsureSuccessStatusCode();
                 var responseString = await response.Content.ReadAsStringAsync();
 
