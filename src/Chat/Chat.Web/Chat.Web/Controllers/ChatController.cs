@@ -4,6 +4,7 @@ using Chat.Data.Entities;
 using Chat.Data.Features.Chat;
 using Chat.Observability;
 using Chat.Observability.Options;
+using Chat.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,20 +17,22 @@ public class ChatController : ControllerBase
     private readonly ChatDbContext _context;
     private readonly ILogger<ChatController> _logger;
     private readonly Meter _meter;
-    private readonly ChatApiOptions options;
+    private readonly ChatApiOptions _options;
     private readonly Counter<int> _sentMessages;
     private readonly UserActivityTracker _userActivityTracker;
-    private HttpClient imageProcessingClient;
+    private readonly HttpClient _imageProcessingClient;
+    private readonly IMessageImageService _messageImageService;
 
-    public ChatController(ChatDbContext context, ILogger<ChatController> logger, Meter meter, ChatApiOptions options, IHttpClientFactory httpClientFactory)
+    public ChatController(ChatDbContext context, ILogger<ChatController> logger, Meter meter, ChatApiOptions options, IHttpClientFactory httpClientFactory, IMessageImageService messageImageService)
     {
         _context = context;
         _logger = logger;
         _meter = meter;
-        this.options = options;
+        this._options = options;
         _sentMessages = _meter.CreateCounter<int>("chatapi.messages_sent", null, "Number of messages sent");
         _userActivityTracker = new UserActivityTracker(meter);
-        imageProcessingClient = httpClientFactory.CreateClient("ImageProcessing");
+        _imageProcessingClient = httpClientFactory.CreateClient("ImageProcessing");
+        _messageImageService = messageImageService;
     }
 
     [HttpGet]
@@ -40,7 +43,7 @@ public class ChatController : ControllerBase
             var chatMessages = await _context.ChatMessages
                 .ToListAsync();
 
-            var chatMessageImages = await imageProcessingClient.GetFromJsonAsync<List<ChatMessageImage>>("/api/Image");
+            var chatMessageImages = await _messageImageService.GetMessages();
 
             if (chatMessageImages == null)
             {
@@ -89,7 +92,7 @@ public class ChatController : ControllerBase
 
                 if (request.Images.Count > 0)
                 {
-                    var response = await imageProcessingClient.PostAsJsonAsync($"/api/Image/{id}", request.Images);
+                    var response = await _imageProcessingClient.PostAsJsonAsync($"/api/Image/{id}", request.Images);
                     if (!response.IsSuccessStatusCode)
                     {
                         throw new Exception("Failed to upload images");
