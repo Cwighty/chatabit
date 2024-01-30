@@ -9,7 +9,8 @@ namespace Chat.IntegrationTests.ControllerTests
 {
     public class ChatControllerTests
     {
-        public class GetChatMessagesTest : IClassFixture<ChatApiWebApplicationFactory>        {
+        public class GetChatMessagesTest : IClassFixture<ChatApiWebApplicationFactory>
+        {
             private HttpClient chatHttpClient { get; }
             private readonly ChatApiWebApplicationFactory chatFactory;
 

@@ -15,7 +15,7 @@ namespace Chat.IntegrationTests.ControllerTests
         public ImageControllerTests(ImageProcessingWebApplicationFactory factory)
         {
             Factory = factory;
-            HttpClient = factory.CreateClient();var scope = Factory.Services.GetService<IServiceScopeFactory>()?.CreateScope();
+            HttpClient = factory.CreateClient(); var scope = Factory.Services.GetService<IServiceScopeFactory>()?.CreateScope();
             if (scope == null)
             {
                 throw new InvalidOperationException("Service scope could not be created.");

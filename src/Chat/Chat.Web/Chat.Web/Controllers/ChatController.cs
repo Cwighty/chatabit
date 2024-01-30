@@ -98,7 +98,7 @@ public class ChatController : ControllerBase
                         throw new Exception("Failed to upload images");
                     }
                 }
-               
+
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation("Message posted by {UserName} at {CreatedAt}", dbChatMessage.UserName, dbChatMessage.CreatedAt);

@@ -1,6 +1,6 @@
 ﻿using Chat.Data;
-using Chat.Web;
 using Chat.Data.Entities;
+using Chat.Web;
 using Chat.Web.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
