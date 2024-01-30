@@ -65,6 +65,7 @@ public static class ObservabilityRegistration
                     options.RecordException = true;
                 });
 
+
             tracing.AddOtlpExporter(options =>
             {
                 options.Endpoint = observabilityOptions.CollectorUri;

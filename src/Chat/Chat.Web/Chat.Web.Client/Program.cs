@@ -12,5 +12,4 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().Cre
 builder.Services.AddScoped<MessageFetcher>();
 builder.Services.AddScoped(sp => new ChatOptions());
 
-
 await builder.Build().RunAsync();
