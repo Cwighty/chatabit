@@ -21,12 +21,16 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
 
-        builder.Services.AddDbContext<ChatDbContext>(options =>
+        var configuration = builder.Configuration;
+        ChatApiOptions apiOptions = new();
+        configuration.GetRequiredSection(nameof(ChatApiOptions)).Bind(apiOptions);
+        builder.Services.AddSingleton(apiOptions);
 
+        builder.Services.AddDbContext<ChatDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-        builder.Services
-            .AddHttpClient("My.ServerAPI", client => client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"] ?? throw new Exception("ApiBaseAddress not found in configuration")));
+        builder.Services.AddHttpClient("My.ServerAPI", client => client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"] ?? throw new Exception("ApiBaseAddress not found in configuration")));
+        builder.Services.AddHttpClient("ImageProcessing", client => client.BaseAddress = new Uri(apiOptions.ImageProcessingApiUrl));
 
         builder.Services.AddScoped<MessageFetcher>();
         builder.Services.AddScoped(sp => new ChatOptions());
@@ -35,10 +39,6 @@ public class Program
 
         builder.Services.AddControllers();
 
-        var configuration = builder.Configuration;
-        ChatApiOptions apiOptions = new();
-        configuration.GetRequiredSection(nameof(ChatApiOptions)).Bind(apiOptions);
-        builder.Services.AddSingleton(apiOptions);
 
         builder.AddObservability();
 

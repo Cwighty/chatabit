@@ -1,4 +1,6 @@
-﻿using Chat.Observability;
+﻿using Chat.Data;
+using Chat.Observability;
+using Microsoft.EntityFrameworkCore;
 
 public class Program
 {
@@ -14,6 +16,10 @@ public class Program
         builder.Services.AddControllers();
 
         builder.Services.AddHealthChecks();
+
+        builder.Services.AddDbContext<ChatDbContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
         builder.AddObservability();
 
         var app = builder.Build();

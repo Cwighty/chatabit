@@ -14,11 +14,10 @@
 	  <ProjectReference Include="..\..\Chat.Data\Chat.Data.csproj" />
 	  <ProjectReference Include="..\..\Chat.Observability\Chat.Observability.csproj" />
 	  <ProjectReference Include="..\Chat.Web.Client\Chat.Web.Client.csproj" />
-	  <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.5.0" />
 	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.1" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.1" />
-	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
 	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
 	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 

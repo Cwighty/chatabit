@@ -1,9 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using System.Security.Cryptography.X509Certificates;
-using Chat.Observability.Options;
 
-namespace Chat.Web;
+namespace Chat.Observability;
 
 public static class DiagnosticConfig
 {
