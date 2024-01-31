@@ -55,6 +55,9 @@ jobs:
           if [[ "${{ steps.check_changes.outputs.chat }}" == "true" ]]; then
             matrix+="{\"service\":\"chat\"},"
           fi
+          if [[ "${{ steps.check_changes.outputs.any_other }}" == "true" ]]; then
+            matrix+="{\"service\":\"all\"},"
+          fi
 
           # Remove trailing comma if any service has been added
           matrix=${matrix%,}
