@@ -6,9 +6,6 @@ env:
   POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
   POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
