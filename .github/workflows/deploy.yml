@@ -42,6 +42,7 @@ jobs:
               - 'src/Chat/Chat.Observability/**'
               - 'src/Chat/Chat.Data/**'
               - 'src/ChatDatabase/**'
+              - '.github/workflows/**'
 
       - name: Set matrix for deployment
         id: set-matrix
@@ -51,7 +52,7 @@ jobs:
           if [[ "${{ steps.check_changes.outputs.imageprocessing }}" == "true" ]]; then
             matrix+="{\"service\":\"imageprocessing\"},"
           fi
-          if [[ "${{ steps.check_changes.outputs.web }}" == "true" ]]; then
+          if [[ "${{ steps.check_changes.outputs.chat }}" == "true" ]]; then
             matrix+="{\"service\":\"chat\"},"
           fi
 
