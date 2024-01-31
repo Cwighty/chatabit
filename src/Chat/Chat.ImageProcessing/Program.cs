@@ -1,5 +1,6 @@
 ﻿using Chat.Data;
 using Chat.Observability;
+using Chat.Observability.Options;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chat.ImageProcessing;
@@ -8,6 +9,8 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.AddMicroServiceOptions();
 
         // Add services to the container.
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -2,6 +2,7 @@
 using Chat.Data;
 using Chat.Data.Entities;
 using Chat.Observability;
+using Chat.Observability.Options;
 using ImageMagick;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +15,13 @@ public class ImageController : ControllerBase
 {
     private readonly ChatDbContext _context;
     private readonly ILogger<ImageController> _logger;
+    private readonly MicroServiceOptions microServiceOptions;
 
-    public ImageController(ChatDbContext context, ILogger<ImageController> logger)
+    public ImageController(ChatDbContext context, ILogger<ImageController> logger, MicroServiceOptions microServiceOptions)
     {
         _context = context;
         _logger = logger;
+        this.microServiceOptions = microServiceOptions;
     }
 
     [HttpGet("{id}")]
@@ -43,24 +46,37 @@ public class ImageController : ControllerBase
     [HttpPost("{id}")]
     public async Task<ActionResult> UploadImageForMessage(int id, List<string> images)
     {
-        using (var compressionActivity = DiagnosticConfig.ActivitySource.StartActivity("CompressImages"))
+        if (microServiceOptions.CompressImages)
         {
-            var compressedImages = new List<string>();
-            foreach (var img in images)
+            using (var compressionActivity = DiagnosticConfig.ActivitySource.StartActivity("CompressImages"))
             {
-                var imageData = Convert.FromBase64String(img);
-                var stream = new MemoryStream(imageData);
+                var compressedImages = new List<string>();
+                foreach (var img in images)
+                {
+                    var imageData = Convert.FromBase64String(img);
+                    var stream = new MemoryStream(imageData);
 
-                var optimizer = new ImageOptimizer();
-                optimizer.Compress(stream);
+                    var optimizer = new ImageOptimizer();
+                    optimizer.Compress(stream);
 
-                var compressedImage = Convert.ToBase64String(stream.ToArray());
-                compressedImages.Add(compressedImage);
+                    var compressedImage = Convert.ToBase64String(stream.ToArray());
+                    compressedImages.Add(compressedImage);
+                }
+                var chatMessageImages = compressedImages.Select(compressedImg => new ChatMessageImage()
+                {
+                    ChatMessageId = id,
+                    ImageData = compressedImg,
+                    FileName = Guid.NewGuid().ToString(),
+                });
+                _context.ChatMessageImages.AddRange(chatMessageImages);
             }
-            var chatMessageImages = compressedImages.Select(compressedImg => new ChatMessageImage()
+        }
+        else
+        {
+            var chatMessageImages = images.Select(img => new ChatMessageImage()
             {
                 ChatMessageId = id,
-                ImageData = compressedImg,
+                ImageData = img,
                 FileName = Guid.NewGuid().ToString(),
             });
             _context.ChatMessageImages.AddRange(chatMessageImages);

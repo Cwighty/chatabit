@@ -34,6 +34,7 @@ services:
       context: ../../src/Chat/
       dockerfile: Chat.ImageProcessing/Dockerfile
     environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ObservabilityOptions__CollectorUrl=http://collector:4317
     restart: always
 
