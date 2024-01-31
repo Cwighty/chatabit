@@ -73,7 +73,7 @@ public class ChatController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ChatMessage>> PostMessage(NewChatMessageRequest request)
     {
-        using (var activity = DiagnosticConfig.ActivitySource.StartActivity("PostMessage"))
+        using (var activity = DiagnosticConfig.ChatApiActivitySource.StartActivity("PostMessage"))
         {
             activity?.AddTag("images", request.Images.Count.ToString());
             try

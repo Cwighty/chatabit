@@ -48,7 +48,7 @@ public class ImageController : ControllerBase
     {
         if (microServiceOptions.CompressImages)
         {
-            using (var compressionActivity = DiagnosticConfig.ActivitySource.StartActivity("CompressImages"))
+            using (var compressionActivity = DiagnosticConfig.ImageProcessingActivitySource.StartActivity("CompressImages"))
             {
                 var compressedImages = new List<string>();
                 foreach (var img in images)

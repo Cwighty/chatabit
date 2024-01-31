@@ -26,6 +26,7 @@ public static class DiagnosticConfig
                  );
     }
 
-    public static ActivitySource ActivitySource = new ActivitySource("ChatApi");
+    public static ActivitySource ChatApiActivitySource = new ActivitySource("ChatApi");
+    public static ActivitySource ImageProcessingActivitySource = new ActivitySource("ImageProcessing");
 
 }
