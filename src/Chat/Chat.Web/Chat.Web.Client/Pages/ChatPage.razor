@@ -25,7 +25,7 @@
                     <div class="card-body">
                         @foreach (var img in m.Images)
                         {
-                            <img src="@($"data:image/png;base64,{img}")" style="max-width: 30%; height: auto;"/>
+                            <img src="@($"{HttpClient.BaseAddress}api/Image/file/{img}")" style="max-width: 30%; height: auto;"/>
                         }
                         <p class="card-text">@m.MessageText</p>
                     </div>
@@ -61,7 +61,7 @@
             <div class="flex-row">
                 @foreach (var img in uploadedImages)
                 {
-                    <img src="@($"data:image/png;base64,{img}")" style="max-width: 30%; height: auto;"/>
+                    <img src="@($"{HttpClient.BaseAddress}/api/Image/file/{img}")" style="max-width: 30%; height: auto;"/>
                 }
             </div>
         </div>

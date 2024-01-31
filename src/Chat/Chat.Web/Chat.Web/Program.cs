@@ -43,6 +43,17 @@ public class Program
 
         builder.Services.AddControllers();
 
+        builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(name: "AllowAll",
+            builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
+    });
+
 
         builder.AddObservability();
 
@@ -58,6 +69,20 @@ public class Program
             app.UseWebAssemblyDebugging();
             app.UseSwagger();
             app.UseSwaggerUI();
+
+            app.UseCors("AllowAll");
+            app.MapGet("/api/Image/{**rest}", async context =>
+                    {
+                        var httpClient = new HttpClient();
+                        var imageUrl = $"http://localhost:5001{context.Request.Path.Value}";
+                        var response = await httpClient.GetAsync(imageUrl);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var content = await response.Content.ReadAsStreamAsync();
+                            context.Response.ContentType = response.Content.Headers.ContentType.ToString();
+                            await content.CopyToAsync(context.Response.Body);
+                        }
+                    });
         }
         else
         {

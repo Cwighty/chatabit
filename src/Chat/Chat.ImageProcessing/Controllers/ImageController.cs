@@ -37,6 +37,24 @@ public class ImageController : ControllerBase
         return chatMessageImages;
     }
 
+    [HttpGet("file/{id}")]
+    public async Task<ActionResult> GetImageFile(int id)
+    {
+        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
+
+        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
+        var chatMessageImage = await _context.ChatMessageImages
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync();
+
+        if (chatMessageImage == null)
+        {
+            return NotFound();
+        }
+
+        return File(Convert.FromBase64String(chatMessageImage.ImageData), "image/jpeg");
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ChatMessageImage>>> GetAllImages()
     {
