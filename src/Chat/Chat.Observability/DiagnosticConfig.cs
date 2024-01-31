@@ -26,6 +26,7 @@ public static class DiagnosticConfig
                  );
     }
 
+    // ActivitySouce name has to match service name for spans to show up 
     public static ActivitySource ChatApiActivitySource = new ActivitySource("ChatApi");
     public static ActivitySource ImageProcessingActivitySource = new ActivitySource("ChatImageProcessing");
 

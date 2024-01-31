@@ -4,6 +4,8 @@ public class MicroServiceOptions
 {
     public bool CompressImages { get; set; } = true;
 
+    public int IntervalTimeSeconds { get; set; } = 1;
+
 }
 
 public static class MicroServiceOptionsRegistration

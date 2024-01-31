@@ -57,7 +57,9 @@ public class ChatController : ControllerBase
                     .ToList();
             }
 
-            return chatMessages.Select(x => x.ToResponseModel()).ToList();
+            return chatMessages
+                    .TakeLast(10)
+                    .Select(x => x.ToResponseModel()).ToList();
         }
         catch
         {

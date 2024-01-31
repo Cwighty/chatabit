@@ -27,6 +27,9 @@ public class ImageController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<IEnumerable<ChatMessageImage>>> GetImagesForMessage(int id)
     {
+        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
+
+        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
         var chatMessageImages = await _context.ChatMessageImages
             .Where(x => x.ChatMessageId == id)
             .ToListAsync();
@@ -37,6 +40,10 @@ public class ImageController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ChatMessageImage>>> GetAllImages()
     {
+        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
+
+
+        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
         var chatMessageImages = await _context.ChatMessageImages
             .ToListAsync();
 
@@ -46,6 +53,7 @@ public class ImageController : ControllerBase
     [HttpPost("{id}")]
     public async Task<ActionResult> UploadImageForMessage(int id, List<string> images)
     {
+        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
         if (microServiceOptions.CompressImages)
         {
             _logger.LogInformation("Compressing images");
@@ -83,6 +91,7 @@ public class ImageController : ControllerBase
             _context.ChatMessageImages.AddRange(chatMessageImages);
         }
 
+        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
         await _context.SaveChangesAsync();
         return Ok();
     }

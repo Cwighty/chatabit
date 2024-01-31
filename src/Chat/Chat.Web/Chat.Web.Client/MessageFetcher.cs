@@ -21,17 +21,9 @@ public class MessageFetcher
 
     public async Task FetchMessages()
     {
-        try
-        {
-            var messages = await _httpClient.GetFromJsonAsync<List<ChatMessageResponse>>("api/chat");
-            messages?.Reverse();
-            OnMessagesUpdated?.Invoke(messages);
-        }
-        catch (Exception ex)
-        {
-            // Handle exceptions
-            Console.WriteLine(ex.Message);
-        }
+        var messages = await _httpClient.GetFromJsonAsync<List<ChatMessageResponse>>("api/chat");
+        messages?.Reverse();
+        OnMessagesUpdated?.Invoke(messages);
     }
 
     public void Dispose()
