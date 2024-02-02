@@ -1,11 +1,14 @@
 ﻿using Chat.Data;
+using Chat.Data.Entities;
 using Chat.ImageProcessing;
+using Chat.ImageProcessing.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using Testcontainers.PostgreSql;
 
 namespace Chat.IntegrationTests;
@@ -55,6 +58,10 @@ public class ImageProcessingWebApplicationFactory : WebApplicationFactory<Progra
         {
             services.RemoveAll(typeof(DbContextOptions<ChatDbContext>));
             services.AddDbContext<ChatDbContext>(options => options.UseNpgsql(_dbContainer.GetConnectionString()));
+            services.RemoveAll<IRedisService>();
+            var mockRedisService = new Mock<IRedisService>();
+            mockRedisService.Setup(x => x.GetAsync<ChatMessageImage?>(It.IsAny<string>())).ReturnsAsync((ChatMessageImage?)null);
+            services.AddScoped<IRedisService>(_ => mockRedisService.Object);
         });
     }
 }

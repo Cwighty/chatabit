@@ -4,7 +4,13 @@ using StackExchange.Redis;
 
 namespace Chat.ImageProcessing.Services;
 
-public class RedisService
+public interface IRedisService
+{
+    Task SetAsync<T>(string key, T item, TimeSpan? expiry = null);
+    Task<T> GetAsync<T>(string key);
+}
+
+public class RedisService : IRedisService
 {
     private readonly ConnectionMultiplexer _redis;
     private readonly IDatabase _database;

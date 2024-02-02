@@ -17,13 +17,13 @@ public class ImageController : ControllerBase
     private readonly ChatDbContext _context;
     private readonly ILogger<ImageController> _logger;
     private readonly MicroServiceOptions microServiceOptions;
-    private readonly RedisService _redisService;
+    private readonly IRedisService _redisService;
 
     public ImageController(
         ChatDbContext context,
         ILogger<ImageController> logger,
         MicroServiceOptions microServiceOptions,
-        RedisService redisService)
+        IRedisService redisService)
     {
         _context = context;
         _logger = logger;
