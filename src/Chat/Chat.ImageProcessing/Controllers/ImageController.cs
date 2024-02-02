@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.Metrics;
 using Chat.Data;
 using Chat.Data.Entities;
+using Chat.ImageProcessing.Services;
 using Chat.Observability;
 using Chat.Observability.Options;
 using ImageMagick;
@@ -16,12 +17,18 @@ public class ImageController : ControllerBase
     private readonly ChatDbContext _context;
     private readonly ILogger<ImageController> _logger;
     private readonly MicroServiceOptions microServiceOptions;
+    private readonly RedisService _redisService;
 
-    public ImageController(ChatDbContext context, ILogger<ImageController> logger, MicroServiceOptions microServiceOptions)
+    public ImageController(
+        ChatDbContext context,
+        ILogger<ImageController> logger,
+        MicroServiceOptions microServiceOptions,
+        RedisService redisService)
     {
         _context = context;
         _logger = logger;
         this.microServiceOptions = microServiceOptions;
+        _redisService = redisService;
     }
 
     [HttpGet("{id}")]
@@ -40,10 +47,19 @@ public class ImageController : ControllerBase
     [HttpGet("file/{id}")]
     public async Task<ActionResult> GetImageFile(int id)
     {
+        _logger.LogInformation("Getting image file");
         Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
 
+        var chatMessageImage = await _redisService.GetAsync<ChatMessageImage?>($"image:{id}"); ;
+        if (chatMessageImage != null)
+        {
+            _logger.LogInformation("Image found in cache");
+            return File(Convert.FromBase64String(chatMessageImage.ImageData), "image/jpeg");
+        }
+        _logger.LogInformation("Image not found in cache");
         Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-        var chatMessageImage = await _context.ChatMessageImages
+
+        chatMessageImage = await _context.ChatMessageImages
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync();
 
@@ -52,6 +68,7 @@ public class ImageController : ControllerBase
             return NotFound();
         }
 
+        await _redisService.SetAsync($"image:{id}", chatMessageImage);
         return File(Convert.FromBase64String(chatMessageImage.ImageData), "image/jpeg");
     }
 
@@ -75,7 +92,8 @@ public class ImageController : ControllerBase
         if (microServiceOptions.CompressImages)
         {
             _logger.LogInformation("Compressing images");
-            using (var compressionActivity = DiagnosticConfig.ImageProcessingActivitySource.StartActivity("CompressImages"))
+            using (var compressionActivity =
+                   DiagnosticConfig.ImageProcessingActivitySource.StartActivity("CompressImages"))
             {
                 var compressedImages = new List<string>();
                 foreach (var img in images)
@@ -89,11 +107,10 @@ public class ImageController : ControllerBase
                     var compressedImage = Convert.ToBase64String(stream.ToArray());
                     compressedImages.Add(compressedImage);
                 }
+
                 var chatMessageImages = compressedImages.Select(compressedImg => new ChatMessageImage()
                 {
-                    ChatMessageId = id,
-                    ImageData = compressedImg,
-                    FileName = Guid.NewGuid().ToString(),
+                    ChatMessageId = id, ImageData = compressedImg, FileName = Guid.NewGuid().ToString(),
                 });
                 _context.ChatMessageImages.AddRange(chatMessageImages);
             }
@@ -102,9 +119,7 @@ public class ImageController : ControllerBase
         {
             var chatMessageImages = images.Select(img => new ChatMessageImage()
             {
-                ChatMessageId = id,
-                ImageData = img,
-                FileName = Guid.NewGuid().ToString(),
+                ChatMessageId = id, ImageData = img, FileName = Guid.NewGuid().ToString(),
             });
             _context.ChatMessageImages.AddRange(chatMessageImages);
         }

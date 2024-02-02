@@ -5,6 +5,8 @@ public class MicroServiceOptions
     public bool CompressImages { get; set; } = true;
 
     public int IntervalTimeSeconds { get; set; } = 1;
+    
+    public string Redis { get; set; } = "cache:6379";
 
 }
 

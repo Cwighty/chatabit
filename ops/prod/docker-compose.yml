@@ -36,6 +36,7 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ObservabilityOptions__CollectorUrl=http://collector:4317
+      - MicroServiceOptions__Redis=cache
     restart: always
 
   swag:
@@ -57,3 +58,8 @@ services:
     ports:
       - 0.0.0.0:1234:443
     restart: unless-stopped
+
+  cache:
+    container_name: dc-redis
+    image: redis:latest
+    restart: always

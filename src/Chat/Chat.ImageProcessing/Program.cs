@@ -1,4 +1,5 @@
 ﻿using Chat.Data;
+using Chat.ImageProcessing.Services;
 using Chat.Observability;
 using Chat.Observability.Options;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,8 @@ public class Program
         builder.Services.AddDbContext<ChatDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+        builder.Services.AddSingleton<RedisService>();
+        
         builder.AddObservability();
 
         var app = builder.Build();
