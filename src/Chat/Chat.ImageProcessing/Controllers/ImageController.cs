@@ -110,7 +110,9 @@ public class ImageController : ControllerBase
 
                 var chatMessageImages = compressedImages.Select(compressedImg => new ChatMessageImage()
                 {
-                    ChatMessageId = id, ImageData = compressedImg, FileName = Guid.NewGuid().ToString(),
+                    ChatMessageId = id,
+                    ImageData = compressedImg,
+                    FileName = Guid.NewGuid().ToString(),
                 });
                 _context.ChatMessageImages.AddRange(chatMessageImages);
             }
@@ -119,7 +121,9 @@ public class ImageController : ControllerBase
         {
             var chatMessageImages = images.Select(img => new ChatMessageImage()
             {
-                ChatMessageId = id, ImageData = img, FileName = Guid.NewGuid().ToString(),
+                ChatMessageId = id,
+                ImageData = img,
+                FileName = Guid.NewGuid().ToString(),
             });
             _context.ChatMessageImages.AddRange(chatMessageImages);
         }

@@ -26,7 +26,7 @@ public class Program
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
         builder.Services.AddSingleton<RedisService>();
-        
+
         builder.AddObservability();
 
         var app = builder.Build();
