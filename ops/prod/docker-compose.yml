@@ -44,7 +44,7 @@ services:
       - MicroServiceOptions__Identifier=1
       - MicroServiceOptions__ImageDirectory=/app/images
     volumes:
-      - images1:/images
+      - images1:/app/images
 
   imageprocessing2:
     <<: *imageprocessing_base
@@ -56,7 +56,7 @@ services:
       - MicroServiceOptions__Identifier=2
       - MicroServiceOptions__ImageDirectory=/app/images
     volumes:
-      - images2:/images
+      - images2:/app/images
 
   swag:
     container_name: dc-swag
