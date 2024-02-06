@@ -36,7 +36,7 @@ services:
 
   imageprocessing1:
     <<: *imageprocessing_base
-    container_name: dc-imageprocessing
+    container_name: dc-imageprocessing1
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ObservabilityOptions__CollectorUrl=http://collector:4317
@@ -47,7 +47,7 @@ services:
 
   imageprocessing2:
     <<: *imageprocessing_base
-    container_name: dc-imageprocessing
+    container_name: dc-imageprocessing2
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ObservabilityOptions__CollectorUrl=http://collector:4317
