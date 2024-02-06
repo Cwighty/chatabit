@@ -8,29 +8,23 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--web.listen-address=:8080"
-    ports:
-      - "8080:8080"
     environment:
       - config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ../../shared/config-files/prometheus.yaml:/etc/prometheus/prometheus.yml
-    networks:
-      - practical-otel-net
 
   loki:
     image: grafana/loki:latest
     command: ["-config.file=/etc/loki/local-config.yaml"]
-    networks:
-      - practical-otel-net
+
 
   grafana:
     image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
     volumes:
       - ../../shared/config-files/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
       - ../../shared/config-files/grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/default.yaml
       - ../../shared/dashboards:/var/lib/grafana/dashboards
+      - ../../shared/config-files/grafana.ini:/etc/grafana/grafana.ini
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -40,9 +34,3 @@ services:
       - prometheus
       - loki
       - collector
-    networks:
-      - practical-otel-net
-
-networks:
-  practical-otel-net:
-    name: practical-otel-net
