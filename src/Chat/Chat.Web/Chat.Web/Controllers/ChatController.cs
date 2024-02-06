@@ -78,18 +78,31 @@ public class ChatController : ControllerBase
 
                 if (request.Images.Count > 0)
                 {
-                    var chatMessageImages = request.Images.Select(imgData => new UploadChatImageRequest()
+                    var imageReferences = request.Images.Select(img => new ChatMessageImage()
                     {
-                        ChatMessageId = dbChatMessage.Id,
                         Id = Guid.NewGuid(),
-                        ImageData = imgData
+                        ChatMessageId = dbChatMessage.Id,
+                    });
+                    await _context.ChatMessageImages.AddRangeAsync(imageReferences);
+                    await _context.SaveChangesAsync();
+
+                    imageReferences = _context.ChatMessageImages.Where(x => x.ChatMessageId == dbChatMessage.Id).ToList();
+
+                    var imageUploadRequests = imageReferences.Zip(request.Images, (image, imgData) =>
+                    {
+                        return new UploadChatImageRequest()
+                        {
+                            Id = image.Id,
+                            ImageData = imgData
+                        };
                     });
 
-                    var response = await _imageProcessingClient.PostAsJsonAsync($"/api/Image/", chatMessageImages);
+                    var response = await _imageProcessingClient.PostAsJsonAsync($"/api/Image/", imageUploadRequests);
                     if (!response.IsSuccessStatusCode)
                     {
                         throw new Exception("Failed to upload images");
                     }
+
                 }
 
                 await _context.SaveChangesAsync();

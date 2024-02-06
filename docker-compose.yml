@@ -5,6 +5,8 @@ services:
   postgres:
     image: postgres:latest
     container_name: chatdb
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: chatdb
       POSTGRES_USER: admin

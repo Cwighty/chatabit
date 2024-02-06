@@ -24,7 +24,9 @@ public partial class ChatDbContext : DbContext
 
             entity.ToTable("chat_message");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")
@@ -39,7 +41,9 @@ public partial class ChatDbContext : DbContext
 
             entity.ToTable("chat_message_image");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.ChatMessageId).HasColumnName("chat_message_id");
 
             entity.HasOne(d => d.ChatMessage).WithMany(p => p.ChatMessageImages)
@@ -47,7 +51,6 @@ public partial class ChatDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("chat_message_image_chat_message_id_fkey");
         });
-
 
         OnModelCreatingPartial(modelBuilder);
     }
