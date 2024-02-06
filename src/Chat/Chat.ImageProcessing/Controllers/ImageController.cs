@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Metrics;
-using Chat.Data;
+﻿using Chat.Data;
 using Chat.Data.Entities;
 using Chat.ImageProcessing.Services;
 using Chat.Observability;
@@ -20,28 +19,13 @@ public class ImageController : ControllerBase
     private readonly IRedisService _redisService;
 
     public ImageController(
-        ChatDbContext context,
         ILogger<ImageController> logger,
         MicroServiceOptions microServiceOptions,
         IRedisService redisService)
     {
-        _context = context;
         _logger = logger;
         this.microServiceOptions = microServiceOptions;
         _redisService = redisService;
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<IEnumerable<ChatMessageImage>>> GetImagesForMessage(int id)
-    {
-        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-
-        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-        var chatMessageImages = await _context.ChatMessageImages
-            .Where(x => x.ChatMessageId == id)
-            .ToListAsync();
-
-        return chatMessageImages;
     }
 
     [HttpGet("file/{id}")]
@@ -50,26 +34,26 @@ public class ImageController : ControllerBase
         _logger.LogInformation("Getting image file");
         Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
 
-        var chatMessageImage = await _redisService.GetAsync<ChatMessageImage?>($"image:{id}"); ;
-        if (chatMessageImage != null)
+        var imageData = await _redisService.GetAsync<string?>($"image:{id}"); ;
+        if (imageData != null)
         {
             _logger.LogInformation("Image found in cache");
-            return File(Convert.FromBase64String(chatMessageImage.ImageData), "image/jpeg");
+            return File(Convert.FromBase64String(imageData), "image/jpeg");
         }
         _logger.LogInformation("Image not found in cache");
         Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
 
-        chatMessageImage = await _context.ChatMessageImages
-            .Where(x => x.Id == id)
-            .FirstOrDefaultAsync();
-
-        if (chatMessageImage == null)
+        var filePath = $"./{id}.jpg";
+        if (System.IO.File.Exists(filePath))
         {
-            return NotFound();
+            _logger.LogInformation("Image found on disk");
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            imageData = Convert.ToBase64String(fileBytes);
+            await _redisService.SetAsync($"image:{id}", imageData);
+            return File(fileBytes, "image/jpeg");
         }
 
-        await _redisService.SetAsync($"image:{id}", chatMessageImage);
-        return File(Convert.FromBase64String(chatMessageImage.ImageData), "image/jpeg");
+        return NotFound();
     }
 
     [HttpGet]
@@ -108,24 +92,20 @@ public class ImageController : ControllerBase
                     compressedImages.Add(compressedImage);
                 }
 
-                var chatMessageImages = compressedImages.Select(compressedImg => new ChatMessageImage()
+                foreach (var compressedImage in compressedImages)
                 {
-                    ChatMessageId = id,
-                    ImageData = compressedImg,
-                    FileName = Guid.NewGuid().ToString(),
-                });
-                _context.ChatMessageImages.AddRange(chatMessageImages);
+                    var fileName = Guid.NewGuid().ToString();
+                    System.IO.File.WriteAllBytes($"./{fileName}.jpg", Convert.FromBase64String(compressedImage));
+                }
             }
         }
         else
         {
-            var chatMessageImages = images.Select(img => new ChatMessageImage()
+            foreach (var img in images)
             {
-                ChatMessageId = id,
-                ImageData = img,
-                FileName = Guid.NewGuid().ToString(),
-            });
-            _context.ChatMessageImages.AddRange(chatMessageImages);
+                var fileName = Guid.NewGuid().ToString();
+                System.IO.File.WriteAllBytes($"./{fileName}.jpg", Convert.FromBase64String(img));
+            }
         }
 
         Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
