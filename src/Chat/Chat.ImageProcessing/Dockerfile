@@ -23,4 +23,5 @@ RUN dotnet publish "./Chat.ImageProcessing.csproj" -c $BUILD_CONFIGURATION -o /a
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+RUN mkdir /images && chmod 777 /images
 ENTRYPOINT ["dotnet", "Chat.ImageProcessing.dll"]
