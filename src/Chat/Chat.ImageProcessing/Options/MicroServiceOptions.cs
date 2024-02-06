@@ -10,6 +10,8 @@ public class MicroServiceOptions
 
     public int Identifier { get; set; } = 1;
 
+    public string ImageDirectory { get; set; } = "/images";
+
 }
 
 public static class MicroServiceOptionsRegistration

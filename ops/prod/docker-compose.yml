@@ -42,6 +42,7 @@ services:
       - ObservabilityOptions__CollectorUrl=http://collector:4317
       - MicroServiceOptions__Redis=cache
       - MicroServiceOptions__Identifier=1
+      - MicroServiceOptions__ImageDirectory=/app/images
     volumes:
       - images1:/images
 
@@ -53,6 +54,7 @@ services:
       - ObservabilityOptions__CollectorUrl=http://collector:4317
       - MicroServiceOptions__Redis=cache
       - MicroServiceOptions__Identifier=2
+      - MicroServiceOptions__ImageDirectory=/app/images
     volumes:
       - images2:/images
 

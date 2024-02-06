@@ -54,7 +54,7 @@ public class ImageController : ControllerBase
         if (imageOwnerIdentifier.ServiceIdentifier == microServiceOptions.Identifier)
         {
             _logger.LogInformation("Image found on this server");
-            var filePath = $"/images/{id}.jpg";
+            var filePath = $"{microServiceOptions.ImageDirectory}/{id}.jpg";
             if (System.IO.File.Exists(filePath))
             {
                 _logger.LogInformation("Image found on disk");
@@ -102,7 +102,7 @@ public class ImageController : ControllerBase
 
                     var compressedImage = Convert.ToBase64String(stream.ToArray());
                     Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-                    System.IO.File.WriteAllBytes($"/images/{img.Id}.jpg", Convert.FromBase64String(compressedImage));
+                    System.IO.File.WriteAllBytes($"{microServiceOptions.ImageDirectory}/{img.Id}.jpg", Convert.FromBase64String(compressedImage));
                     var imageReference = new ImageLocation
                     {
                         Id = Guid.NewGuid(),
@@ -119,7 +119,7 @@ public class ImageController : ControllerBase
             foreach (var img in uploadRequest)
             {
                 Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-                System.IO.File.WriteAllBytes($"./{img.Id}.jpg", Convert.FromBase64String(img.ImageData));
+                System.IO.File.WriteAllBytes($"{microServiceOptions.ImageDirectory}/{img.Id}.jpg", Convert.FromBase64String(img.ImageData));
             }
         }
 
