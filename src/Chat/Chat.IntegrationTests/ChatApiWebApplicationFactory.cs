@@ -1,7 +1,6 @@
 ﻿using Chat.Data;
 using Chat.Data.Entities;
 using Chat.Web;
-using Chat.Web.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -58,10 +57,6 @@ public class ChatApiWebApplicationFactory : WebApplicationFactory<Program>, IAsy
         {
             services.RemoveAll(typeof(DbContextOptions<ChatDbContext>));
             services.AddDbContext<ChatDbContext>(options => options.UseNpgsql(_dbContainer.GetConnectionString()));
-            services.RemoveAll(typeof(IMessageImageService));
-            var mockMessageImageService = new Mock<IMessageImageService>();
-            mockMessageImageService.Setup(x => x.GetMessages()).ReturnsAsync(new List<ChatMessageImage>());
-            services.AddScoped<IMessageImageService>(_ => mockMessageImageService.Object);
         });
     }
 }

@@ -61,7 +61,7 @@
             <div class="flex-row">
                 @foreach (var img in uploadedImages)
                 {
-                    <img src="@($"{HttpClient.BaseAddress}/api/Image/file/{img}")" style="max-width: 30%; height: auto;"/>
+                    <img src="@($"data:image/png;base64,{img}")" style="max-width: 30%; height: auto;" />
                 }
             </div>
         </div>

@@ -16,8 +16,6 @@ public partial class ChatDbContext : DbContext
 
     public virtual DbSet<ChatMessageImage> ChatMessageImages { get; set; }
 
-    public virtual DbSet<Person> People { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ChatMessage>(entity =>
@@ -43,8 +41,6 @@ public partial class ChatDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ChatMessageId).HasColumnName("chat_message_id");
-            entity.Property(e => e.FileName).HasColumnName("file_name");
-            entity.Property(e => e.ImageData).HasColumnName("image_data");
 
             entity.HasOne(d => d.ChatMessage).WithMany(p => p.ChatMessageImages)
                 .HasForeignKey(d => d.ChatMessageId)
@@ -52,15 +48,6 @@ public partial class ChatDbContext : DbContext
                 .HasConstraintName("chat_message_image_chat_message_id_fkey");
         });
 
-        modelBuilder.Entity<Person>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("person_pkey");
-
-            entity.ToTable("person");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Name).HasColumnName("name");
-        });
 
         OnModelCreatingPartial(modelBuilder);
     }

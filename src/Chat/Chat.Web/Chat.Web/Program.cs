@@ -4,7 +4,6 @@ using Chat.Observability.Options;
 using Chat.Web.Client;
 using Chat.Web.Client.Options;
 using Chat.Web.Components;
-using Chat.Web.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Web;
@@ -33,8 +32,6 @@ public class Program
 
         builder.Services.AddHttpClient("My.ServerAPI", client => client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"] ?? throw new Exception("ApiBaseAddress not found in configuration")));
         builder.Services.AddHttpClient("ImageProcessing", client => client.BaseAddress = new Uri(apiOptions.ImageProcessingApiUrl));
-
-        builder.Services.AddScoped<IMessageImageService, MessageImageService>();
 
         builder.Services.AddScoped<MessageFetcher>();
         builder.Services.AddScoped(sp => new ChatOptions());
@@ -74,7 +71,7 @@ public class Program
             app.MapGet("/api/Image/{**rest}", async context =>
                     {
                         var httpClient = new HttpClient();
-                        var imageUrl = $"http://localhost:5001{context.Request.Path.Value}";
+                        var imageUrl = $"http://imageprocessing:8080{context.Request.Path.Value}";
                         var response = await httpClient.GetAsync(imageUrl);
                         if (response.IsSuccessStatusCode)
                         {

@@ -39,7 +39,7 @@ namespace Chat.IntegrationTests.ControllerTests
             {
                 var chatMessage = new ChatMessage
                 {
-                    Id = 1,
+                    Id = Guid.NewGuid(),
                     MessageText = "test",
                     CreatedAt = DateTime.Now,
                     UserName = "testUser",
@@ -50,9 +50,7 @@ namespace Chat.IntegrationTests.ControllerTests
 
                 var chatMessageImage = new ChatMessageImage
                 {
-                    ChatMessageId = 1,
-                    ImageData = "randomData",
-                    FileName = "testImage",
+                    ChatMessageId = Guid.NewGuid(),
                 };
 
                 DbContext.ChatMessageImages.Add(chatMessageImage);
@@ -63,7 +61,6 @@ namespace Chat.IntegrationTests.ControllerTests
                 Assert.NotNull(response);
                 Assert.True(response.Count > 0);
                 Assert.Equal(chatMessageImage.ChatMessageId, response[0].ChatMessageId);
-                Assert.Equal(chatMessageImage.ImageData, response[0].ImageData);
             }
         }
 
@@ -78,7 +75,7 @@ namespace Chat.IntegrationTests.ControllerTests
             {
                 var chatMessage = new ChatMessage
                 {
-                    Id = 1,
+                    Id = Guid.NewGuid(),
                     MessageText = "test",
                     CreatedAt = DateTime.Now,
                     UserName = "testUser",
@@ -98,7 +95,6 @@ namespace Chat.IntegrationTests.ControllerTests
                 var dbImages = DbContext.ChatMessageImages.ToList();
 
                 dbImages.ForEach(image => Assert.Equal(chatMessage.Id, image.ChatMessageId));
-                dbImages.ForEach(image => Assert.Contains(image.ImageData, images));
             }
         }
     }

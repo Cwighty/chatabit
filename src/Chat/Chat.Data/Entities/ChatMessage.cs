@@ -5,7 +5,7 @@ namespace Chat.Data.Entities;
 
 public partial class ChatMessage
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     public string MessageText { get; set; } = null!;
 

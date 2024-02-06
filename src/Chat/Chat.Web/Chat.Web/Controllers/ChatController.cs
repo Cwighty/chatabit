@@ -2,9 +2,9 @@
 using Chat.Data;
 using Chat.Data.Entities;
 using Chat.Data.Features.Chat;
+using Chat.Features.Chat;
 using Chat.Observability;
 using Chat.Observability.Options;
-using Chat.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,9 +21,8 @@ public class ChatController : ControllerBase
     private readonly Counter<int> _sentMessages;
     private readonly UserActivityTracker _userActivityTracker;
     private readonly HttpClient _imageProcessingClient;
-    private readonly IMessageImageService _messageImageService;
 
-    public ChatController(ChatDbContext context, ILogger<ChatController> logger, Meter meter, ChatApiOptions options, IHttpClientFactory httpClientFactory, IMessageImageService messageImageService)
+    public ChatController(ChatDbContext context, ILogger<ChatController> logger, Meter meter, ChatApiOptions options, IHttpClientFactory httpClientFactory)
     {
         _context = context;
         _logger = logger;
@@ -32,7 +31,6 @@ public class ChatController : ControllerBase
         _sentMessages = _meter.CreateCounter<int>("chatapi.messages_sent", null, "Number of messages sent");
         _userActivityTracker = new UserActivityTracker(meter);
         _imageProcessingClient = httpClientFactory.CreateClient("ImageProcessing");
-        _messageImageService = messageImageService;
     }
 
     [HttpGet]
@@ -41,21 +39,8 @@ public class ChatController : ControllerBase
         try
         {
             var chatMessages = await _context.ChatMessages
+                .Include(x => x.ChatMessageImages)
                 .ToListAsync();
-
-            var chatMessageImages = await _messageImageService.GetMessages();
-
-            if (chatMessageImages == null)
-            {
-                throw new Exception("Failed to get images");
-            }
-
-            foreach (var chatMessage in chatMessages)
-            {
-                chatMessage.ChatMessageImages = chatMessageImages
-                    .Where(cmi => cmi.ChatMessageId == chatMessage.Id)
-                    .ToList();
-            }
 
             return chatMessages
                     .TakeLast(10)
@@ -82,6 +67,7 @@ public class ChatController : ControllerBase
             {
                 var dbChatMessage = new ChatMessage()
                 {
+                    Id = Guid.NewGuid(),
                     MessageText = request.MessageText,
                     UserName = request.UserName,
                     CreatedAt = DateTime.Now,
@@ -90,11 +76,16 @@ public class ChatController : ControllerBase
                 await _context.ChatMessages.AddAsync(dbChatMessage);
                 await _context.SaveChangesAsync();
 
-                var id = dbChatMessage.Id;
-
                 if (request.Images.Count > 0)
                 {
-                    var response = await _imageProcessingClient.PostAsJsonAsync($"/api/Image/{id}", request.Images);
+                    var chatMessageImages = request.Images.Select(imgData => new UploadChatImageRequest()
+                    {
+                        ChatMessageId = dbChatMessage.Id,
+                        Id = Guid.NewGuid(),
+                        ImageData = imgData
+                    });
+
+                    var response = await _imageProcessingClient.PostAsJsonAsync($"/api/Image/", chatMessageImages);
                     if (!response.IsSuccessStatusCode)
                     {
                         throw new Exception("Failed to upload images");

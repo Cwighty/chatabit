@@ -1,11 +1,11 @@
 ﻿using Chat.Data;
 using Chat.Data.Entities;
+using Chat.Features.Chat;
 using Chat.ImageProcessing.Services;
 using Chat.Observability;
 using Chat.Observability.Options;
 using ImageMagick;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Web.Controllers;
 
@@ -29,7 +29,7 @@ public class ImageController : ControllerBase
     }
 
     [HttpGet("file/{id}")]
-    public async Task<ActionResult> GetImageFile(int id)
+    public async Task<ActionResult> GetImageFile(Guid id)
     {
         _logger.LogInformation("Getting image file");
         Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
@@ -56,21 +56,8 @@ public class ImageController : ControllerBase
         return NotFound();
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<ChatMessageImage>>> GetAllImages()
-    {
-        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-
-
-        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-        var chatMessageImages = await _context.ChatMessageImages
-            .ToListAsync();
-
-        return chatMessageImages;
-    }
-
-    [HttpPost("{id}")]
-    public async Task<ActionResult> UploadImageForMessage(int id, List<string> images)
+    [HttpPost]
+    public async Task<ActionResult> UploadImageForMessage(List<UploadChatImageRequest> uploadRequest)
     {
         Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
         if (microServiceOptions.CompressImages)
@@ -80,36 +67,29 @@ public class ImageController : ControllerBase
                    DiagnosticConfig.ImageProcessingActivitySource.StartActivity("CompressImages"))
             {
                 var compressedImages = new List<string>();
-                foreach (var img in images)
+                foreach (var img in uploadRequest)
                 {
-                    var imageData = Convert.FromBase64String(img);
+                    var imageData = Convert.FromBase64String(img.ImageData);
                     var stream = new MemoryStream(imageData);
 
                     var optimizer = new ImageOptimizer();
                     optimizer.Compress(stream);
 
                     var compressedImage = Convert.ToBase64String(stream.ToArray());
-                    compressedImages.Add(compressedImage);
-                }
-
-                foreach (var compressedImage in compressedImages)
-                {
-                    var fileName = Guid.NewGuid().ToString();
-                    System.IO.File.WriteAllBytes($"./{fileName}.jpg", Convert.FromBase64String(compressedImage));
+                    Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
+                    System.IO.File.WriteAllBytes($"./{img.Id}.jpg", Convert.FromBase64String(compressedImage));
                 }
             }
         }
         else
         {
-            foreach (var img in images)
+            foreach (var img in uploadRequest)
             {
-                var fileName = Guid.NewGuid().ToString();
-                System.IO.File.WriteAllBytes($"./{fileName}.jpg", Convert.FromBase64String(img));
+                Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
+                System.IO.File.WriteAllBytes($"./{img.Id}.jpg", Convert.FromBase64String(img.ImageData));
             }
         }
 
-        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-        await _context.SaveChangesAsync();
         return Ok();
     }
 }
