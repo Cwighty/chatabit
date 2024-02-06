@@ -22,6 +22,9 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
+        builder.Services.AddDbContext<ChatDbContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
         builder.Services.AddSingleton<IRedisService, RedisService>();
 
         builder.AddObservability();

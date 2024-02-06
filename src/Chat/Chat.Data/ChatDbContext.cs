@@ -16,6 +16,8 @@ public partial class ChatDbContext : DbContext
 
     public virtual DbSet<ChatMessageImage> ChatMessageImages { get; set; }
 
+    public virtual DbSet<ImageLocation> ImageLocations { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ChatMessage>(entity =>
@@ -50,6 +52,19 @@ public partial class ChatDbContext : DbContext
                 .HasForeignKey(d => d.ChatMessageId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("chat_message_image_chat_message_id_fkey");
+        });
+
+        modelBuilder.Entity<ImageLocation>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("image_location_pkey");
+
+            entity.ToTable("image_location");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.ChatMessageImageId).HasColumnName("chat_message_image_id");
+            entity.Property(e => e.ServiceIdentifier).HasColumnName("service_identifier");
         });
 
         OnModelCreatingPartial(modelBuilder);

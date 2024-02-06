@@ -13,3 +13,9 @@ create table chat_message_image (
     chat_message_id uuid not null,
     foreign key (chat_message_id) references chat_message(id)
 );
+
+create table image_location (
+    id uuid primary key,
+    chat_message_image_id uuid not null,
+    service_identifier numeric not null
+);

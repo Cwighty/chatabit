@@ -3,6 +3,12 @@ version: "3.9"
 include:
   - compose.telemetry.yml
 
+x-imageprocessing-base: &imageprocessing_base
+  build:
+    context: ../../src/Chat/
+    dockerfile: Chat.ImageProcessing/Dockerfile
+  restart: always
+
 services:
   postgres:
     image: postgres:latest
@@ -24,20 +30,31 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ApiBaseAddress=https://chatabit.duckdns.org:1234
-      - ChatApiOptions__ImageProcessingApiUrl=http://imageprocessing:8080
+      - ChatApiOptions__ImageProcessingApiUrl=https://chatabit.duckdns.org:1234
       - ObservabilityOptions__CollectorUrl=http://collector:4317
     restart: always
 
-  imageprocessing:
+  imageprocessing1:
+    <<: *imageprocessing_base
     container_name: dc-imageprocessing
-    build:
-      context: ../../src/Chat/
-      dockerfile: Chat.ImageProcessing/Dockerfile
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ObservabilityOptions__CollectorUrl=http://collector:4317
       - MicroServiceOptions__Redis=cache
-    restart: always
+      - MicroServiceOptions__Identifier=1
+    volumes:
+      - images1:/images
+
+  imageprocessing2:
+    <<: *imageprocessing_base
+    container_name: dc-imageprocessing
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      - ObservabilityOptions__CollectorUrl=http://collector:4317
+      - MicroServiceOptions__Redis=cache
+      - MicroServiceOptions__Identifier=2
+    volumes:
+      - images2:/images
 
   swag:
     container_name: dc-swag
@@ -63,3 +80,7 @@ services:
     container_name: dc-redis
     image: redis:latest
     restart: always
+
+volumes:
+  images1:
+  images2:

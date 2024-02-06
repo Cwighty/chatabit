@@ -21,10 +21,12 @@ public class ImageController : ControllerBase
     public ImageController(
         ILogger<ImageController> logger,
         MicroServiceOptions microServiceOptions,
+        ChatDbContext context,
         IRedisService redisService)
     {
         _logger = logger;
         this.microServiceOptions = microServiceOptions;
+        _context = context;
         _redisService = redisService;
     }
 
@@ -41,16 +43,39 @@ public class ImageController : ControllerBase
             return File(Convert.FromBase64String(imageData), "image/jpeg");
         }
         _logger.LogInformation("Image not found in cache");
-        Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
 
-        var filePath = $"./{id}.jpg";
-        if (System.IO.File.Exists(filePath))
+        var imageOwnerIdentifier = _context.ImageLocations.FirstOrDefault(x => x.ChatMessageImageId == id);
+        if (imageOwnerIdentifier == null)
         {
-            _logger.LogInformation("Image found on disk");
-            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-            imageData = Convert.ToBase64String(fileBytes);
-            await _redisService.SetAsync($"image:{id}", imageData);
-            return File(fileBytes, "image/jpeg");
+            _logger.LogInformation("Image not found on any server");
+            return NotFound();
+        }
+
+        if (imageOwnerIdentifier.ServiceIdentifier == microServiceOptions.Identifier)
+        {
+            _logger.LogInformation("Image found on this server");
+            var filePath = $"/images/{id}.jpg";
+            if (System.IO.File.Exists(filePath))
+            {
+                _logger.LogInformation("Image found on disk");
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                imageData = Convert.ToBase64String(fileBytes);
+                await _redisService.SetAsync($"image:{id}", imageData);
+                return File(fileBytes, "image/jpeg");
+            }
+        }
+        else
+        {
+            var serviceName = $"http://imageprocessing{imageOwnerIdentifier.ServiceIdentifier}:8080";
+            var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync($"{serviceName}/api/image/file/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Image found on another server");
+                var fileBytes = await response.Content.ReadAsByteArrayAsync();
+                return File(fileBytes, "image/jpeg");
+            }
         }
 
         return NotFound();
@@ -77,7 +102,15 @@ public class ImageController : ControllerBase
 
                     var compressedImage = Convert.ToBase64String(stream.ToArray());
                     Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-                    System.IO.File.WriteAllBytes($"./{img.Id}.jpg", Convert.FromBase64String(compressedImage));
+                    System.IO.File.WriteAllBytes($"/images/{img.Id}.jpg", Convert.FromBase64String(compressedImage));
+                    var imageReference = new ImageLocation
+                    {
+                        Id = Guid.NewGuid(),
+                        ChatMessageImageId = img.Id,
+                        ServiceIdentifier = microServiceOptions.Identifier
+                    };
+                    _context.ImageLocations.Add(imageReference);
+                    await _context.SaveChangesAsync();
                 }
             }
         }

@@ -8,6 +8,8 @@ public class MicroServiceOptions
 
     public string Redis { get; set; } = "cache:6379";
 
+    public int Identifier { get; set; } = 1;
+
 }
 
 public static class MicroServiceOptionsRegistration
