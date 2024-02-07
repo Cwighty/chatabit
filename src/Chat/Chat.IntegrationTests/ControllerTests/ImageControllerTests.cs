@@ -1,7 +1,12 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using Chat.Data;
 using Chat.Data.Entities;
+using Chat.Features.Chat;
+using Chat.ImageProcessing.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace Chat.IntegrationTests.ControllerTests
 {
@@ -28,73 +33,44 @@ namespace Chat.IntegrationTests.ControllerTests
             }
             DbContext = dbContext;
         }
-        public class GetChatMessageImagesTest : ImageControllerTests
+        public class GetImageFileTest : ImageControllerTests
         {
-            public GetChatMessageImagesTest(ImageProcessingWebApplicationFactory factory) : base(factory)
+            public GetImageFileTest(ImageProcessingWebApplicationFactory factory) : base(factory)
             {
             }
 
             [Fact]
-            public async Task GetChatMessagesImagesTestAsync_ShouldContainAnImage()
+            public async Task GetImageFile_NotFoundInCacheAndDisk_ReturnsNotFound()
             {
-                var chatMessage = new ChatMessage
-                {
-                    Id = Guid.NewGuid(),
-                    MessageText = "test",
-                    CreatedAt = DateTime.Now,
-                    UserName = "testUser",
-                };
+                var imageId = Guid.NewGuid();
+                
+                var response = await HttpClient.GetAsync($"/api/Image/file/{imageId}");
 
-                DbContext.ChatMessages.Add(chatMessage);
-                await DbContext.SaveChangesAsync();
-
-                var chatMessageImage = new ChatMessageImage
-                {
-                    ChatMessageId = Guid.NewGuid(),
-                };
-
-                DbContext.ChatMessageImages.Add(chatMessageImage);
-                await DbContext.SaveChangesAsync();
-
-                var response = await HttpClient.GetFromJsonAsync<List<ChatMessageImage>>("/api/Image");
-
-                Assert.NotNull(response);
-                Assert.True(response.Count > 0);
-                Assert.Equal(chatMessageImage.ChatMessageId, response[0].ChatMessageId);
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
 
-        public class PostChatMessageImagesTest : ImageControllerTests
+        public class UploadImageForMessageTest : ImageControllerTests
         {
-            public PostChatMessageImagesTest(ImageProcessingWebApplicationFactory factory) : base(factory)
+            public UploadImageForMessageTest(ImageProcessingWebApplicationFactory factory) : base(factory)
             {
             }
 
             [Fact]
-            public async Task PostChatMessagesImagesTestAsync_ShouldContainAnImage()
+            public async Task UploadImageForMessage_ImagesUploadedSuccessfully_ReturnsOk()
             {
-                var chatMessage = new ChatMessage
+                var uploadRequest = new List<UploadChatImageRequest>
                 {
-                    Id = Guid.NewGuid(),
-                    MessageText = "test",
-                    CreatedAt = DateTime.Now,
-                    UserName = "testUser",
+                    new UploadChatImageRequest
+                    {
+                        Id = Guid.NewGuid(),
+                        ImageData = TestImage.ImageData 
+                    }
                 };
 
-                DbContext.ChatMessages.Add(chatMessage);
-                await DbContext.SaveChangesAsync();
+                var response = await HttpClient.PostAsJsonAsync("/api/Image", uploadRequest);
 
-                var images = new List<string>
-                {
-                    TestImage.ImageData
-                };
-                var response = await HttpClient.PostAsJsonAsync($"/api/Image/{chatMessage.Id}", images);
                 response.EnsureSuccessStatusCode();
-
-
-                var dbImages = DbContext.ChatMessageImages.ToList();
-
-                dbImages.ForEach(image => Assert.Equal(chatMessage.Id, image.ChatMessageId));
             }
         }
     }

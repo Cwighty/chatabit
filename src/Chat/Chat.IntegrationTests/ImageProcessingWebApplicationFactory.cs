@@ -2,6 +2,7 @@
 using Chat.Data.Entities;
 using Chat.ImageProcessing;
 using Chat.ImageProcessing.Services;
+using Chat.Observability.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -50,6 +51,13 @@ public class ImageProcessingWebApplicationFactory : WebApplicationFactory<Progra
     async Task IAsyncLifetime.DisposeAsync()
     {
         await _dbContainer.StopAsync();
+
+        // delete all jpg files in the TestUploads directory 
+        var directory = FindProjectRootByMarker() + "/Chat/Chat.IntegrationTests/TestUploads";
+        foreach (var file in Directory.EnumerateFiles(directory, "*.jpg"))
+        {
+            File.Delete(file);
+        }
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -62,6 +70,15 @@ public class ImageProcessingWebApplicationFactory : WebApplicationFactory<Progra
             var mockRedisService = new Mock<IRedisService>();
             mockRedisService.Setup(x => x.GetAsync<ChatMessageImage?>(It.IsAny<string>())).ReturnsAsync((ChatMessageImage?)null);
             services.AddScoped<IRedisService>(_ => mockRedisService.Object);
+
+            services.RemoveAll<MicroServiceOptions>();
+            services.AddScoped(options =>
+            new MicroServiceOptions
+            {
+                Identifier = 1,
+                IntervalTimeSeconds = 1,
+                ImageDirectory = "../../../TestUploads",
+            });
         });
     }
 }
