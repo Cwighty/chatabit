@@ -43,7 +43,7 @@ namespace Chat.IntegrationTests.ControllerTests
             public async Task GetImageFile_NotFoundInCacheAndDisk_ReturnsNotFound()
             {
                 var imageId = Guid.NewGuid();
-                
+
                 var response = await HttpClient.GetAsync($"/api/Image/file/{imageId}");
 
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -64,7 +64,7 @@ namespace Chat.IntegrationTests.ControllerTests
                     new UploadChatImageRequest
                     {
                         Id = Guid.NewGuid(),
-                        ImageData = TestImage.ImageData 
+                        ImageData = TestImage.ImageData
                     }
                 };
 
