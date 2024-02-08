@@ -46,7 +46,7 @@ services:
     environment:
       <<: *imageprocessing-environment
       MicroServiceOptions__Identifier: 1
-      ObservabilityOptions__ServiceName: ChatImageProcessing1 
+      ObservabilityOptions__ServiceName: ChatImageProcessing1
     volumes:
       - images1:/app/images
 
@@ -69,6 +69,15 @@ services:
       ObservabilityOptions__ServiceName: ChatImageProcessing3
     volumes:
       - images3:/app/images
+
+  imageredundancy:
+    container_name: dc-imageredundancy
+    build:
+      context: ../../src/Chat/
+      dockerfile: Chat.ImageRedundancy/Dockerfile
+    environment:
+      MicroServiceOptions__SleepInterval: 30
+      MicroServiceOptions__ImageProcessingServiceName: imageprocessing 
 
   swag:
     container_name: dc-swag

@@ -56,6 +56,16 @@ services:
     volumes:
       - images3:/images
 
+  imageredundancy:
+    build: ./src/Chat
+    environment:
+      MicroServiceOptions__SleepInterval: 5
+    command: >
+      /bin/bash
+      -c "
+        dotnet run --project Chat.ImageRedundancy
+        "
+
   chat:
     build: ./src/Chat
     environment:

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Chat.ImageRedundancy": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
