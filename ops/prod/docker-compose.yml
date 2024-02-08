@@ -46,6 +46,7 @@ services:
     environment:
       <<: *imageprocessing-environment
       MicroServiceOptions__Identifier: 1
+      ObservabilityOptions__ServiceName: ChatImageProcessing1 
     volumes:
       - images1:/app/images
 
@@ -55,6 +56,7 @@ services:
     environment:
       <<: *imageprocessing-environment
       MicroServiceOptions__Identifier: 2
+      ObservabilityOptions__ServiceName: ChatImageProcessing2
     volumes:
       - images2:/app/images
 
@@ -64,6 +66,7 @@ services:
     environment:
       <<: *imageprocessing-environment
       MicroServiceOptions__Identifier: 3
+      ObservabilityOptions__ServiceName: ChatImageProcessing3
     volumes:
       - images3:/app/images
 
