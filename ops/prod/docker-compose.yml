@@ -77,7 +77,9 @@ services:
       dockerfile: Chat.ImageRedundancy/Dockerfile
     environment:
       MicroServiceOptions__SleepInterval: 30
-      MicroServiceOptions__ImageProcessingServiceName: imageprocessing 
+      MicroServiceOptions__ImageProcessingServiceName: imageprocessing
+      MicroServiceOptions__ImageProcessingServiceCount: 3
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
 
   swag:
     container_name: dc-swag
