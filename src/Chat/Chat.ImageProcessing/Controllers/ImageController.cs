@@ -36,12 +36,14 @@ public class ImageController : ControllerBase
         _logger.LogInformation("Getting image file");
         Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
 
-        var imageData = await _redisService.GetAsync<string?>($"image:{id}"); ;
+        var imageData = await _redisService.GetAsync<string?>($"image:{id}");
+        ;
         if (imageData != null)
         {
             _logger.LogInformation("Image found in cache");
             return File(Convert.FromBase64String(imageData), "image/jpeg");
         }
+
         _logger.LogInformation("Image not found in cache");
 
         var imageOwnerIdentifier = _context.ImageLocations.FirstOrDefault(x => x.ChatMessageImageId == id);
@@ -102,7 +104,8 @@ public class ImageController : ControllerBase
 
                     var compressedImage = Convert.ToBase64String(stream.ToArray());
                     Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-                    System.IO.File.WriteAllBytes($"{microServiceOptions.ImageDirectory}/{img.Id}.jpg", Convert.FromBase64String(compressedImage));
+                    System.IO.File.WriteAllBytes($"{microServiceOptions.ImageDirectory}/{img.Id}.jpg",
+                        Convert.FromBase64String(compressedImage));
                     var imageReference = new ImageLocation
                     {
                         Id = Guid.NewGuid(),
@@ -119,10 +122,43 @@ public class ImageController : ControllerBase
             foreach (var img in uploadRequest)
             {
                 Thread.Sleep(microServiceOptions.IntervalTimeSeconds * 1000);
-                System.IO.File.WriteAllBytes($"{microServiceOptions.ImageDirectory}/{img.Id}.jpg", Convert.FromBase64String(img.ImageData));
+                System.IO.File.WriteAllBytes($"{microServiceOptions.ImageDirectory}/{img.Id}.jpg",
+                    Convert.FromBase64String(img.ImageData));
             }
         }
 
+        return Ok();
+    }
+
+    [HttpPost("fetch-missing-image/{id:guid}")]
+    public async Task<ActionResult> NotifyMissingImage(Guid id)
+    {
+        var imageOwnerIdentifier = _context.ImageLocations.FirstOrDefault(x => x.ChatMessageImageId == id);
+        if (imageOwnerIdentifier == null)
+        {
+            return NotFound();
+        }
+
+        var serviceName = $"http://imageprocessing{imageOwnerIdentifier.ServiceIdentifier}:8080/";
+        var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync(serviceName + $"api/image/file/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            return NotFound();
+        }
+
+        var imageData = await response.Content.ReadAsByteArrayAsync();
+        await System.IO.File.WriteAllBytesAsync($"{microServiceOptions.ImageDirectory}/{id}.jpg", imageData);
+        
+        var imageReference = new ImageLocation
+        {
+            Id = Guid.NewGuid(),
+            ChatMessageImageId = id,
+            ServiceIdentifier = microServiceOptions.Identifier
+        };
+        _context.ImageLocations.Add(imageReference);
+        await _context.SaveChangesAsync();
+        
         return Ok();
     }
 }
