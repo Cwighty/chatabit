@@ -22,6 +22,8 @@ public class Worker : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var activity = DiagnosticConfig.ImageProcessingActivitySource.StartActivity("ImageRedundancyCheck");
+        DiagnosticConfig.TrackImageRedundancyNonRedundant(GetNonRedundantImageCount);
+        DiagnosticConfig.TrackImageRedundancyUploadTotal(GetTotalImageCount);
         while (!stoppingToken.IsCancellationRequested)
         {
             _logger.LogInformation("Checking for image redundancy at: {time}", DateTimeOffset.Now);
@@ -60,4 +62,23 @@ public class Worker : BackgroundService
             }
         }
     }
+
+    private int GetTotalImageCount()
+    {
+        // number of unique images
+        return _dbContext.ImageLocations
+            .GroupBy(il => il.ChatMessageImageId)
+            .Count();
+    }
+
+    private int GetNonRedundantImageCount()
+    {
+        // number of unique images that are not redundant
+        return _dbContext.ImageLocations
+            .GroupBy(il => il.ChatMessageImageId)
+            .Where(g => g.Count() == 1)
+            .Count();
+    }
+
+
 }

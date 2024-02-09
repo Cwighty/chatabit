@@ -10,6 +10,22 @@ public static class DiagnosticConfig
     public static Counter<int> ControllerErrorCounter = Meter.CreateCounter<int>("chatapi.controller_errors", null, "Number of controller errors");
     public static Counter<int> ControllerCallCounter = Meter.CreateCounter<int>("chatapi.controller_calls", null, "Number of controller calls");
 
+    public static Meter ImageRedundancyMeter = new Meter("ChatImageRedundancy");
+
+    public static ObservableGauge<int> ImageRedundancyUploadTotalGuage {get; set;} = default;
+    public static ObservableGauge<int> ImageRedundancyUploadNonRedundantGuage {get; set;} = default;
+
+    public static void TrackImageRedundancyUploadTotal(Func<int> func)
+    {
+        ImageRedundancyUploadTotalGuage = ImageRedundancyMeter.CreateObservableGauge<int>("chatimageredundancy.total_upload", func, "Number of images uploaded");
+    }
+
+    public static void TrackImageRedundancyNonRedundant(Func<int> func)
+    {
+        ImageRedundancyUploadNonRedundantGuage = ImageRedundancyMeter.CreateObservableGauge<int>("chatimageredundancy.total_nonredundant", func, "Number of non-redundant images uploaded");
+    }
+
+
     public static void TrackControllerError(string controllerName, string actionName)
     {
         ControllerErrorCounter.Add(1,
