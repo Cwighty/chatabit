@@ -42,6 +42,28 @@ public static class ObservabilityRegistration
 
         return builder;
     }
+    
+    public static HostApplicationBuilder AddObservability(this HostApplicationBuilder builder)
+    {
+        Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+
+        var configuration = builder.Configuration;
+
+        ObservabilityOptions observabilityOptions = new();
+
+        configuration.GetRequiredSection(nameof(ObservabilityOptions)).Bind(observabilityOptions);
+
+        builder.Services.AddSingleton(observabilityOptions);
+
+        // builder.AddSerilog();
+
+        builder
+            .Services.AddOpenTelemetry()
+            .AddTracing(observabilityOptions)
+            .AddMetrics(observabilityOptions);
+
+        return builder;
+    }
 
     private static OpenTelemetryBuilder AddTracing(
         this OpenTelemetryBuilder builder,

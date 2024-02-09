@@ -1,27 +1,18 @@
-﻿using Chat.ImageRedundancy.Options;
-using Microsoft.Extensions.Configuration;
+using Chat.ImageRedundancy;
+using Chat.ImageRedundancy.Options;
+using Chat.Observability;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        // read the configuration from the environment variables
-        var configuration = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .Build();
+        var builder = Host.CreateApplicationBuilder(args);
+        builder.Services.AddHostedService<Worker>();
+        
+        builder.AddMicroServiceOptions();
+        builder.AddObservability();
 
-        // bind to the MicroServiceOptions
-        MicroServiceOptions microServiceOptions = new();
-        configuration.GetRequiredSection(nameof(MicroServiceOptions)).Bind(microServiceOptions);
-
-
-        while (true)
-        {
-            // sleep for the configured interval
-            Thread.Sleep(microServiceOptions.SleepInterval * 1000);
-
-            // check for redundant images
-            Console.WriteLine("Checking for redundant images");
-        }
+        var host = builder.Build();
+        host.Run();
     }
 }

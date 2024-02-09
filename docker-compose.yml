@@ -60,6 +60,7 @@ services:
     build: ./src/Chat
     environment:
       MicroServiceOptions__SleepInterval: 5
+      ObservabilityOptions__CollectorUrl: http://collector:4317
     command: >
       /bin/bash
       -c "
