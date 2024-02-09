@@ -42,7 +42,7 @@ public static class ObservabilityRegistration
 
         return builder;
     }
-    
+
     public static HostApplicationBuilder AddObservability(this HostApplicationBuilder builder)
     {
         Activity.DefaultIdFormat = ActivityIdFormat.W3C;
