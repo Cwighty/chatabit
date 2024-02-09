@@ -12,8 +12,8 @@ public static class DiagnosticConfig
 
     public static Meter ImageRedundancyMeter = new Meter("ChatImageRedundancy");
 
-    public static ObservableGauge<int> ImageRedundancyUploadTotalGuage {get; set;} = default;
-    public static ObservableGauge<int> ImageRedundancyUploadNonRedundantGuage {get; set;} = default;
+    public static ObservableGauge<int> ImageRedundancyUploadTotalGuage { get; set; } = default;
+    public static ObservableGauge<int> ImageRedundancyUploadNonRedundantGuage { get; set; } = default;
 
     public static void TrackImageRedundancyUploadTotal(Func<int> func)
     {
