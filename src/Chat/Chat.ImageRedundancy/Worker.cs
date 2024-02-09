@@ -74,11 +74,13 @@ public class Worker : BackgroundService
     private int GetNonRedundantImageCount()
     {
         // number of unique images that are not redundant
-        return _dbContext.ImageLocations
+        var imageLocations = _dbContext.ImageLocations
+                .ToList();
+
+        return imageLocations
             .GroupBy(il => il.ChatMessageImageId)
             .Where(g => g.Count() == 1)
+            .SelectMany(g => g)
             .Count();
     }
-
-
 }
