@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Runtime.InteropServices;
 using Chat.Observability.Options;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -53,9 +54,9 @@ public static class ObservabilityRegistration
 
         configuration.GetRequiredSection(nameof(ObservabilityOptions)).Bind(observabilityOptions);
 
-        builder.Services.AddSingleton(observabilityOptions);
+        builder.AddSerilog();
 
-        // builder.AddSerilog();
+        builder.Services.AddSingleton(observabilityOptions);
 
         builder
             .Services.AddOpenTelemetry()
@@ -146,38 +147,55 @@ public static class ObservabilityRegistration
             {
                 var environment = context.HostingEnvironment.EnvironmentName;
                 var configuration = context.Configuration;
-
-                ObservabilityOptions observabilityOptions = new();
-
-                configuration.GetSection(nameof(ObservabilityOptions)).Bind(observabilityOptions);
-
-                var configOptions = new ConfigurationReaderOptions()
-                {
-                    SectionName = $"{nameof(ObservabilityOptions)}:{nameof(ObservabilityOptions)}:Serilog",
-                };
-
-                options
-                    .ReadFrom.Configuration(context.Configuration, configOptions)
-                    .Enrich.FromLogContext()
-                    .Enrich.WithEnvironment(environment)
-                    .Enrich.WithMachineName()
-                    .Enrich.WithExceptionDetails()
-                    .Enrich.WithDemystifiedStackTraces()
-                    .Enrich.WithProperty("ApplicationName", observabilityOptions.ServiceName);
-
-                options.WriteTo.OpenTelemetry(cfg =>
-                {
-                    cfg.Endpoint = $"{observabilityOptions.CollectorUrl}/v1/logs";
-                    cfg.IncludedData = IncludedData.TraceIdField | IncludedData.SpanIdField;
-                    cfg.ResourceAttributes = new Dictionary<string, object>
-                    {
-                        { "service.name", observabilityOptions.ServiceName },
-                    };
-                })
-                .WriteTo.Console();
+                SerilogBaseConfig(options, environment, configuration);
             }
         );
         return hostBuilder;
+    }
+
+    public static HostApplicationBuilder AddSerilog(this HostApplicationBuilder hostBuilder)
+    {
+        var environment = hostBuilder.Environment.EnvironmentName;
+        var configuration = hostBuilder.Configuration;
+
+        hostBuilder.Services.AddSerilog((serviceProvide, config) =>
+        {
+            SerilogBaseConfig(config, environment, configuration);
+        });
+
+        return hostBuilder;
+    }
+
+    private static void SerilogBaseConfig(LoggerConfiguration options, string environment, IConfiguration configuration)
+    {
+        ObservabilityOptions observabilityOptions = new();
+
+        configuration.GetSection(nameof(ObservabilityOptions)).Bind(observabilityOptions);
+
+        var configOptions = new ConfigurationReaderOptions()
+        {
+            SectionName = $"{nameof(ObservabilityOptions)}:{nameof(ObservabilityOptions)}:Serilog",
+        };
+
+        options
+            .ReadFrom.Configuration(configuration, configOptions)
+            .Enrich.FromLogContext()
+            .Enrich.WithEnvironment(environment)
+            .Enrich.WithMachineName()
+            .Enrich.WithExceptionDetails()
+            .Enrich.WithDemystifiedStackTraces()
+            .Enrich.WithProperty("ApplicationName", observabilityOptions.ServiceName);
+
+        options.WriteTo.OpenTelemetry(cfg =>
+        {
+            cfg.Endpoint = $"{observabilityOptions.CollectorUrl}/v1/logs";
+            cfg.IncludedData = IncludedData.TraceIdField | IncludedData.SpanIdField;
+            cfg.ResourceAttributes = new Dictionary<string, object>
+                    {
+                        { "service.name", observabilityOptions.ServiceName },
+                    };
+        })
+        .WriteTo.Console();
     }
 
     public static ILoggingBuilder AddOpenTelemetryLogging(this ILoggingBuilder loggingBuilder, ObservabilityOptions observabilityOptions)
