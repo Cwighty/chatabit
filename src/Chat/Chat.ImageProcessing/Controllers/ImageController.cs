@@ -149,7 +149,7 @@ public class ImageController : ControllerBase
 
         var imageData = await response.Content.ReadAsByteArrayAsync();
         await System.IO.File.WriteAllBytesAsync($"{microServiceOptions.ImageDirectory}/{id}.jpg", imageData);
-        
+
         var imageReference = new ImageLocation
         {
             Id = Guid.NewGuid(),
@@ -158,7 +158,7 @@ public class ImageController : ControllerBase
         };
         _context.ImageLocations.Add(imageReference);
         await _context.SaveChangesAsync();
-        
+
         return Ok();
     }
 }

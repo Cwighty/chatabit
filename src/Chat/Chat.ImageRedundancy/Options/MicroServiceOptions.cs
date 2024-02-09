@@ -4,9 +4,9 @@ public class MicroServiceOptions
 {
     public int SleepInterval { get; set; } = 5;
 
-   public string ImageProcessingServiceName { get; set; } = "imageprocessing";
-   
-   public int ImageProcessingServiceCount { get; set; } = 3;
+    public string ImageProcessingServiceName { get; set; } = "imageprocessing";
+
+    public int ImageProcessingServiceCount { get; set; } = 3;
 }
 
 public static class MicroServiceOptionsRegistration

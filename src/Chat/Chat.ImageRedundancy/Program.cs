@@ -1,4 +1,4 @@
-using Chat.Data;
+﻿using Chat.Data;
 using Chat.ImageRedundancy;
 using Chat.ImageRedundancy.Options;
 using Chat.Observability;
@@ -10,7 +10,7 @@ internal class Program
     {
         var builder = Host.CreateApplicationBuilder(args);
         builder.Services.AddHostedService<Worker>();
-        
+
         builder.Services.AddDbContext<ChatDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")),
             ServiceLifetime.Singleton);
