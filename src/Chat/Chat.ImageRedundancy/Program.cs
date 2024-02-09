@@ -8,11 +8,13 @@ internal class Program
     {
         var builder = Host.CreateApplicationBuilder(args);
         builder.Services.AddHostedService<Worker>();
-        
+
         builder.AddMicroServiceOptions();
         builder.AddObservability();
 
         var host = builder.Build();
+
+
         host.Run();
     }
 }

@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Chat.ImageRedundancy.Options;
+using Chat.Observability;
 
 namespace Chat.ImageRedundancy;
 
@@ -15,6 +17,7 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        using var activity = DiagnosticConfig.ImageProcessingActivitySource.StartActivity("ImageRedundancyCheck");
         while (!stoppingToken.IsCancellationRequested)
         {
             _logger.LogInformation("Checking for image redundancy at: {time}", DateTimeOffset.Now);
