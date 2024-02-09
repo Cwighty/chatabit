@@ -1,4 +1,4 @@
-using Chat.ImageRedundancy;
+﻿using Chat.ImageRedundancy;
 using Chat.ImageRedundancy.Options;
 using Chat.Observability;
 

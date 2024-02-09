@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Chat.ImageRedundancy.Options;
 using Chat.Observability;
 
