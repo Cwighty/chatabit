@@ -76,6 +76,8 @@ services:
       context: ../../src/Chat/
       dockerfile: Chat.ImageRedundancy/Dockerfile
     environment:
+      ObservabilityOptions__ServiceName: ChatImageRedundancy
+      ObservabilityOptions__CollectorUrl: http://collector:4317
       MicroServiceOptions__SleepInterval: 30
       MicroServiceOptions__ImageProcessingServiceName: imageprocessing
       MicroServiceOptions__ImageProcessingServiceCount: 3
