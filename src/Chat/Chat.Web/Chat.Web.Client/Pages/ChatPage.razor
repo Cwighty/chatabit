@@ -1,8 +1,12 @@
 @page "/Chat"
+@rendermode @(new InteractiveWebAssemblyRenderMode(false))
+@implements IAsyncDisposable
 @using Chat.Web.Client.Options
 @using global::Chat.Data.Entities
 @using Chat.Data.Features.Chat
 @using System.Threading
+@using Microsoft.AspNetCore.SignalR.Client;
+@inject NavigationManager Navigation
 @inject ChatOptions options
 @inject HttpClient HttpClient
 @inject MessageFetcher mfer;
@@ -31,6 +35,13 @@
                     </div>
                 </div>
             }
+            @foreach (var user in userTyping)
+            {
+                if (user.Value)
+                {
+                    <div class="text-muted">@user.Key is typing...</div>
+                }
+            }
         }
     </div>
 
@@ -42,7 +53,7 @@
     {
         <div class="form-group mb-2">
             <label>Message</label>
-            <InputTextArea @bind-Value="message" class="form-control"/>
+            <InputTextArea @bind-Value="message" disabled="@(String.IsNullOrEmpty(username))" @oninput="UserTyping" class="form-control"/>
         </div>
         <div class="row mb-2">
             <div class="col-md-9">
@@ -79,23 +90,35 @@
     private Guid? inputFileId = Guid.NewGuid();
     private Timer? pollingTimer;
     private bool isDisposed = false;
+    private HubConnection? hubConnection;
+    private Dictionary<string, bool> userTyping = new Dictionary<string, bool>();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        if (HttpClient.BaseAddress.ToString().Contains("localhost"))
+        {
         mfer.OnMessagesUpdated += UpdateMessages;
         mfer.StartFetchingMessages(TimeSpan.FromMilliseconds(options.PollingIntervalMilliseconds));
+
+
+            hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri(HttpClient.BaseAddress + "api/chatHub"))
+            .Build();
+
+            hubConnection.On<string, bool>("UserTyping", (user, typing) =>
+            {
+                userTyping[user] = typing;
+                InvokeAsync(StateHasChanged);
+            });
+
+            await hubConnection.StartAsync();
+        }
     }
 
     private void UpdateMessages(List<ChatMessageResponse> messages)
     {
         Messages = messages;
         StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        mfer.OnMessagesUpdated -= UpdateMessages;
-        mfer.Dispose();
     }
 
     private async Task HandleSelectedFiles(InputFileChangeEventArgs e)
@@ -135,5 +158,35 @@
         message = "";
         uploadedImages.Clear();
         inputFileId = Guid.NewGuid();
+    }
+
+    
+    private async Task UserTyping()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("UserTyping", username, true);
+        }
+    }
+
+    private async Task UserNotTyping()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("UserTyping", username, false);
+        }
+    }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        mfer.OnMessagesUpdated -= UpdateMessages;
+        mfer.Dispose();
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
     }
 }

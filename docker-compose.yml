@@ -1,5 +1,5 @@
-include:
-  - ./ops/dev/observability/docker-compose.yml
+# include:
+#   - ./ops/dev/observability/docker-compose.yml
 
 x-imageprocessing-base: &imageprocessing_base
   build: ./src/Chat

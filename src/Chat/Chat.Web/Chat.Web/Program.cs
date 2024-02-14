@@ -4,6 +4,7 @@ using Chat.Observability.Options;
 using Chat.Web.Client;
 using Chat.Web.Client.Options;
 using Chat.Web.Components;
+using Chat.Web.Hubs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Web;
@@ -40,6 +41,8 @@ public class Program
 
         builder.Services.AddControllers();
 
+        builder.Services.AddSignalR();
+
         builder.Services.AddCors(options =>
     {
         options.AddPolicy(name: "AllowAll",
@@ -68,6 +71,7 @@ public class Program
             app.UseSwaggerUI();
 
             app.UseCors("AllowAll");
+            app.MapHub<ChatHub>("/api/chatHub");
             app.MapGet("/api/Image/{**rest}", async context =>
                     {
                         var httpClient = new HttpClient();
