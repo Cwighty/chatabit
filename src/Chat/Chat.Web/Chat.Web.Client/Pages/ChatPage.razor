@@ -95,24 +95,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (HttpClient.BaseAddress.ToString().Contains("localhost"))
-        {
         mfer.OnMessagesUpdated += UpdateMessages;
         mfer.StartFetchingMessages(TimeSpan.FromMilliseconds(options.PollingIntervalMilliseconds));
 
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(Navigation.ToAbsoluteUri(HttpClient.BaseAddress + "api/chatHub"))
+        .Build();
 
-            hubConnection = new HubConnectionBuilder()
-            .WithUrl(Navigation.ToAbsoluteUri(HttpClient.BaseAddress + "api/chatHub"))
-            .Build();
+        hubConnection.On<string, bool>("UserTyping", (user, typing) =>
+        {
+            Console.WriteLine($"{user} is typing: {typing}");
+            userTyping[user] = typing;
+            InvokeAsync(StateHasChanged);
+        });
 
-            hubConnection.On<string, bool>("UserTyping", (user, typing) =>
-            {
-                userTyping[user] = typing;
-                InvokeAsync(StateHasChanged);
-            });
-
-            await hubConnection.StartAsync();
-        }
+        await hubConnection.StartAsync();
     }
 
     private void UpdateMessages(List<ChatMessageResponse> messages)

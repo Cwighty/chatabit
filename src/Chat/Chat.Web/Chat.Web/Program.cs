@@ -5,6 +5,7 @@ using Chat.Web.Client;
 using Chat.Web.Client.Options;
 using Chat.Web.Components;
 using Chat.Web.Hubs;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Web;
@@ -41,6 +42,12 @@ public class Program
 
         builder.Services.AddControllers();
 
+        builder.Services.AddResponseCompression(opts =>
+        {
+            opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+        });
+
         builder.Services.AddSignalR();
 
         builder.Services.AddCors(options =>
@@ -71,19 +78,20 @@ public class Program
             app.UseSwaggerUI();
 
             app.UseCors("AllowAll");
+            app.UseResponseCompression();
             app.MapHub<ChatHub>("/api/chatHub");
             app.MapGet("/api/Image/{**rest}", async context =>
+                {
+                    var httpClient = new HttpClient();
+                    var imageUrl = $"http://imageprocessing:8080{context.Request.Path.Value}";
+                    var response = await httpClient.GetAsync(imageUrl);
+                    if (response.IsSuccessStatusCode)
                     {
-                        var httpClient = new HttpClient();
-                        var imageUrl = $"http://imageprocessing:8080{context.Request.Path.Value}";
-                        var response = await httpClient.GetAsync(imageUrl);
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var content = await response.Content.ReadAsStreamAsync();
-                            context.Response.ContentType = response.Content.Headers.ContentType.ToString();
-                            await content.CopyToAsync(context.Response.Body);
-                        }
-                    });
+                        var content = await response.Content.ReadAsStreamAsync();
+                        context.Response.ContentType = response.Content.Headers.ContentType.ToString();
+                        await content.CopyToAsync(context.Response.Body);
+                    }
+                });
         }
         else
         {

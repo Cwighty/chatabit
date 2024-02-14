@@ -4,8 +4,9 @@ namespace Chat.Web.Hubs;
 
 public class ChatHub : Hub
 {
-    public async Task SendMessage(string user, string message)
+    public async Task UserTyping(string user, bool isTyping)
     {
-        await Clients.All.SendAsync("UserTyping", user, message);
+        Console.WriteLine($"User: {user} IsTyping: {isTyping}");
+        await Clients.All.SendAsync("UserTyping", user, isTyping);
     }
 }
