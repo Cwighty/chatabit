@@ -43,7 +43,7 @@ public class ChatController : ControllerBase
                 .ToListAsync();
 
             return chatMessages
-                    .TakeLast(10)
+                    .OrderByDescending(x => x.CreatedAt)
                     .Select(x => x.ToResponseModel()).ToList();
         }
         catch
