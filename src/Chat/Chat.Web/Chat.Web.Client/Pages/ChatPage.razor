@@ -4,7 +4,7 @@
 @using Chat.Web.Client.Options
 @using global::Chat.Data.Entities
 @using Chat.Data.Features.Chat
-@using System.Threading
+@using System.Timers
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject NavigationManager Navigation
 @inject ChatOptions options
@@ -53,7 +53,7 @@
     {
         <div class="form-group mb-2">
             <label>Message</label>
-            <InputTextArea @bind-Value="message" disabled="@(String.IsNullOrEmpty(username))" @oninput="UserTyping" class="form-control"/>
+            <InputTextArea @bind-Value="message" disabled="@(String.IsNullOrEmpty(username))" @oninput="OnUserTyping" class="form-control"/>
         </div>
         <div class="row mb-2">
             <div class="col-md-9">
@@ -92,9 +92,18 @@
     private bool isDisposed = false;
     private HubConnection? hubConnection;
     private Dictionary<string, bool> userTyping = new Dictionary<string, bool>();
+    private Timer? typingTimer;
 
     protected override async Task OnInitializedAsync()
     {
+        typingTimer = new Timer(3000);
+        typingTimer.Elapsed += async (sender, e) =>
+        {
+            await SendUserNotTypingMessage();
+        };
+        typingTimer.AutoReset = false;
+        typingTimer.Enabled = true;
+
         mfer.OnMessagesUpdated += UpdateMessages;
         mfer.StartFetchingMessages(TimeSpan.FromMilliseconds(options.PollingIntervalMilliseconds));
 
@@ -104,7 +113,6 @@
 
         hubConnection.On<string, bool>("UserTyping", (user, typing) =>
         {
-            Console.WriteLine($"{user} is typing: {typing}");
             userTyping[user] = typing;
             InvokeAsync(StateHasChanged);
         });
@@ -157,8 +165,18 @@
         inputFileId = Guid.NewGuid();
     }
 
+    private async Task OnUserTyping()
+    {
+        await SendUserTypingMessage();
+        if (typingTimer is not null)
+        {
+            typingTimer.Stop();
+            typingTimer.Start();
+        }
+    }
+
     
-    private async Task UserTyping()
+    private async Task SendUserTypingMessage()
     {
         if (hubConnection is not null)
         {
@@ -166,7 +184,7 @@
         }
     }
 
-    private async Task UserNotTyping()
+    private async Task SendUserNotTypingMessage()
     {
         if (hubConnection is not null)
         {
@@ -179,6 +197,7 @@
 
     public async ValueTask DisposeAsync()
     {
+        typingTimer?.Dispose();
         mfer.OnMessagesUpdated -= UpdateMessages;
         mfer.Dispose();
         if (hubConnection is not null)

@@ -24,7 +24,6 @@ public class MessageFetcher
         try
         {
             var messages = await _httpClient.GetFromJsonAsync<List<ChatMessageResponse>>("api/chat");
-            messages?.Reverse();
             OnMessagesUpdated?.Invoke(messages);
         }
         catch (Exception e)

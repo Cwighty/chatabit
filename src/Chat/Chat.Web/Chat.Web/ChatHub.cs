@@ -6,7 +6,6 @@ public class ChatHub : Hub
 {
     public async Task UserTyping(string user, bool isTyping)
     {
-        Console.WriteLine($"User: {user} IsTyping: {isTyping}");
-        await Clients.All.SendAsync("UserTyping", user, isTyping);
+        await Clients.Others.SendAsync("UserTyping", user, isTyping);
     }
 }
