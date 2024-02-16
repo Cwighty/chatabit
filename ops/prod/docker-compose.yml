@@ -40,6 +40,13 @@ services:
       - ObservabilityOptions__CollectorUrl=http://collector:4317
     restart: always
 
+  signalrserver:
+    container_name: dc-signalrserver
+    build:
+      context: ../../src/Chat/
+      dockerfile: Chat.SignalRServer/Dockerfile
+    restart: always
+
   imageprocessing1:
     <<: *imageprocessing_base
     container_name: dc-imageprocessing1
