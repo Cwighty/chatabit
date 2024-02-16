@@ -4,8 +4,6 @@ using Chat.Observability.Options;
 using Chat.Web.Client;
 using Chat.Web.Client.Options;
 using Chat.Web.Components;
-using Chat.Web.Hubs;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Web;
@@ -41,12 +39,6 @@ public class Program
         builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("My.ServerAPI"));
 
         builder.Services.AddControllers();
-
-        builder.Services.AddResponseCompression(opts =>
-        {
-            opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                    new[] { "application/octet-stream" });
-        });
 
         builder.Services.AddSignalR();
 
@@ -97,9 +89,7 @@ public class Program
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
-
-        app.UseResponseCompression();
-        app.MapHub<ChatHub>("/api/chatHub");
+        
         app.UseHttpsRedirection();
 
         app.UseStaticFiles();

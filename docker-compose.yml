@@ -89,7 +89,7 @@ services:
     command: >
       /bin/bash
       -c "
-        dotnet run --project Chat.SiglnalRServer 
+        dotnet run --project Chat.SignalRServer 
         "
 
   reverseproxy:
