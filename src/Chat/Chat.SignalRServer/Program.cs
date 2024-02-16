@@ -1,4 +1,4 @@
-using Chat.SignalRServer;
+﻿using Chat.SignalRServer;
 using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
