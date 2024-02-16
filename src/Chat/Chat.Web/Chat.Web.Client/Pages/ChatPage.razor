@@ -96,7 +96,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        typingTimer = new Timer(3000);
+        typingTimer = new Timer(1000);
         typingTimer.Elapsed += async (sender, e) =>
         {
             await SendUserNotTypingMessage();
