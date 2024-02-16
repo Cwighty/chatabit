@@ -82,6 +82,16 @@ services:
         dotnet run --project Chat.Web/Chat.Web
         "
 
+  signalrserver:
+    build: ./src/Chat
+    environment:
+      - DOTNET_URLS=http://+:8080
+    command: >
+      /bin/bash
+      -c "
+        dotnet run --project Chat.SiglnalRServer 
+        "
+
   reverseproxy:
     depends_on:
       - chat
