@@ -78,8 +78,6 @@ public class Program
             app.UseSwaggerUI();
 
             app.UseCors("AllowAll");
-            app.UseResponseCompression();
-            app.MapHub<ChatHub>("/api/chatHub");
             app.MapGet("/api/Image/{**rest}", async context =>
                 {
                     var httpClient = new HttpClient();
@@ -100,6 +98,8 @@ public class Program
             app.UseHsts();
         }
 
+        app.UseResponseCompression();
+        app.MapHub<ChatHub>("/api/chatHub");
         app.UseHttpsRedirection();
 
         app.UseStaticFiles();
