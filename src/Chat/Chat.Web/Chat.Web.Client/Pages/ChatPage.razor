@@ -19,6 +19,13 @@
         }
         else
         {
+            @foreach (var user in userTyping)
+            {
+                if (user.Value)
+                {
+                    <div class="text-muted">@user.Key is typing...</div>
+                }
+            }
             @foreach (var m in Messages)
             {
                 <div class="card mb-3">
@@ -34,13 +41,6 @@
                         <p class="card-text">@m.MessageText</p>
                     </div>
                 </div>
-            }
-            @foreach (var user in userTyping)
-            {
-                if (user.Value)
-                {
-                    <div class="text-muted">@user.Key is typing...</div>
-                }
             }
         }
     </div>
