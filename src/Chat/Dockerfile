@@ -18,4 +18,4 @@ RUN dotnet restore
 
 # Copy everything else and build
 COPY . ./
-RUN dotnet build
+# ENTRYPOINT [ "dotnet", "build" ]

@@ -6,7 +6,7 @@ x-imageprocessing-base: &imageprocessing_base
   command: >
     /bin/bash
     -c "
-      dotnet run --project Chat.ImageProcessing
+      dotnet run --project Chat.ImageProcessing --no-restore
       "
 
 x-imageprocessing-environment: &imageprocessing-environment
@@ -65,7 +65,7 @@ services:
     command: >
       /bin/bash
       -c "
-        dotnet run --project Chat.ImageRedundancy
+        dotnet run --project Chat.ImageRedundancy --no-restore
         "
 
   chat:
@@ -79,7 +79,7 @@ services:
     command: >
       /bin/bash
       -c "
-        dotnet run --project Chat.Web/Chat.Web
+        dotnet run --project Chat.Web/Chat.Web --no-restore
         "
 
   signalrserver:
@@ -89,7 +89,7 @@ services:
     command: >
       /bin/bash
       -c "
-        dotnet run --project Chat.SignalRServer 
+        dotnet run --project Chat.SignalRServer --no-restore
         "
 
   reverseproxy:
