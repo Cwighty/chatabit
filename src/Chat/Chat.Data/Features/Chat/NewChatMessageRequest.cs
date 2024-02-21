@@ -9,4 +9,8 @@ public class NewChatMessageRequest
 
     public List<string> Images { get; set; } = [];
 
+    public int LamportTimestamp { get; set; }
+
+    public Dictionary<string, int> VectorClock { get; set; } = new Dictionary<string, int>();
+
 }

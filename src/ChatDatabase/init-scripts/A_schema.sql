@@ -5,7 +5,9 @@ create table chat_message (
     id uuid primary key,
     message_text text not null,
     created_at timestamp not null default now(),
-    user_name text not null
+    user_name text not null,
+    lamport_clock numeric not null,
+    vector_clock jsonb not null
 );
 
 create table chat_message_image (
