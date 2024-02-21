@@ -4,6 +4,7 @@ using Chat.Observability.Options;
 using Chat.Web.Client;
 using Chat.Web.Client.Options;
 using Chat.Web.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Web;
@@ -37,6 +38,16 @@ public class Program
         builder.Services.AddScoped(sp => new ChatOptions());
 
         builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("My.ServerAPI"));
+
+        builder.Services.AddScoped<HubConnection>(sp =>
+        {
+            var hubConnection = new HubConnectionBuilder()
+                .WithUrl("http://signalrserver:8080/api/chatHub")
+                .WithAutomaticReconnect()
+                .Build();
+            hubConnection.StartAsync().Wait();
+            return hubConnection;
+        });
 
         builder.Services.AddControllers();
 

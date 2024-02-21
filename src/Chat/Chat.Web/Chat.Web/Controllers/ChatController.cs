@@ -6,6 +6,8 @@ using Chat.Features.Chat;
 using Chat.Observability;
 using Chat.Observability.Options;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Web.Controllers;
@@ -18,16 +20,18 @@ public class ChatController : ControllerBase
     private readonly ILogger<ChatController> _logger;
     private readonly Meter _meter;
     private readonly ChatApiOptions _options;
+    private readonly HubConnection _hubConnection;
     private readonly Counter<int> _sentMessages;
     private readonly UserActivityTracker _userActivityTracker;
     private readonly HttpClient _imageProcessingClient;
 
-    public ChatController(ChatDbContext context, ILogger<ChatController> logger, Meter meter, ChatApiOptions options, IHttpClientFactory httpClientFactory)
+    public ChatController(ChatDbContext context, ILogger<ChatController> logger, Meter meter, ChatApiOptions options, IHttpClientFactory httpClientFactory, HubConnection hubConnection)
     {
         _context = context;
         _logger = logger;
         _meter = meter;
         this._options = options;
+        this._hubConnection = hubConnection;
         _sentMessages = _meter.CreateCounter<int>("chatapi.messages_sent", null, "Number of messages sent");
         _userActivityTracker = new UserActivityTracker(meter);
         _imageProcessingClient = httpClientFactory.CreateClient("ImageProcessing");
@@ -113,6 +117,8 @@ public class ChatController : ControllerBase
                 _sentMessages.Add(1);
 
                 _userActivityTracker.TrackUserActivity(dbChatMessage);
+
+                await _hubConnection.SendAsync("NewMessage");
 
                 return Ok();
             }

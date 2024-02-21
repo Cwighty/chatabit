@@ -166,10 +166,7 @@
         };
 
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
-        if (hubConnection is not null)
-        {
-            await hubConnection.SendAsync("NewMessage");
-        }
+
         isBusy = false;
 
         message = "";
