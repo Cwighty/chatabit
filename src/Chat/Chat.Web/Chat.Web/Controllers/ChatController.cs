@@ -44,6 +44,7 @@ public class ChatController : ControllerBase
                 .ToListAsync();
 
             return chatMessages
+                    .Where(x => x.CreatedAt.AddTicks(-x.CreatedAt.Ticks % TimeSpan.TicksPerSecond) > lastMessageDate)
                     .OrderByDescending(x => x.CreatedAt)
                     .Select(x => x.ToResponseModel()).ToList();
         }

@@ -123,7 +123,7 @@
             if (latestMessage is not null)
             {
                 var newMessages = await mfer.FetchMessages(latestMessage.CreatedAt);
-                Messages.AddRange(newMessages); 
+                Messages.InsertRange(0, newMessages); 
                 await InvokeAsync(StateHasChanged);
             } 
         });
@@ -168,7 +168,7 @@
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
         if (hubConnection is not null)
         {
-            await hubConnection.SendAsync("NewMessage", username, true);
+            await hubConnection.SendAsync("NewMessage");
         }
         isBusy = false;
 
