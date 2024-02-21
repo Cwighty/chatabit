@@ -8,4 +8,9 @@ public class ChatHub : Hub
     {
         await Clients.Others.SendAsync("UserTyping", user, isTyping);
     }
+
+    public async Task NewMessage()
+    {
+        await Clients.All.SendAsync("NewMessage");
+    }
 }

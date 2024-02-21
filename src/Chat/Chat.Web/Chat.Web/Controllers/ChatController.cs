@@ -34,12 +34,13 @@ public class ChatController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ChatMessageResponse>>> GetMessages()
+    public async Task<ActionResult<IEnumerable<ChatMessageResponse>>> GetMessagesSinceDate([FromQuery] DateTime lastMessageDate = default(DateTime))
     {
         try
         {
             var chatMessages = await _context.ChatMessages
                 .Include(x => x.ChatMessageImages)
+                .Where(x => x.CreatedAt > lastMessageDate)
                 .ToListAsync();
 
             return chatMessages
@@ -48,12 +49,12 @@ public class ChatController : ControllerBase
         }
         catch
         {
-            DiagnosticConfig.TrackControllerError(nameof(ChatController), nameof(GetMessages));
+            DiagnosticConfig.TrackControllerError(nameof(ChatController), nameof(GetMessagesSinceDate));
             throw;
         }
         finally
         {
-            DiagnosticConfig.TrackControllerCall(nameof(ChatController), nameof(GetMessages));
+            DiagnosticConfig.TrackControllerCall(nameof(ChatController), nameof(GetMessagesSinceDate));
         }
     }
 

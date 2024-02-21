@@ -6,34 +6,21 @@ namespace Chat.Web.Client;
 public class MessageFetcher
 {
     private readonly HttpClient _httpClient;
-    private Timer? _timer;
-    public event Action<List<ChatMessageResponse>>? OnMessagesUpdated;
 
     public MessageFetcher(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
-    public void StartFetchingMessages(TimeSpan interval)
+    public async Task<List<ChatMessageResponse>> FetchMessages()
     {
-        _timer = new Timer(async _ => await FetchMessages(), null, TimeSpan.Zero, interval);
+        var messages = await _httpClient.GetFromJsonAsync<List<ChatMessageResponse>>("api/chat");
+        return messages!;
     }
 
-    public async Task FetchMessages()
+    public async Task<List<ChatMessageResponse>> FetchMessages(DateTime lastMessageDate)
     {
-        try
-        {
-            var messages = await _httpClient.GetFromJsonAsync<List<ChatMessageResponse>>("api/chat");
-            OnMessagesUpdated?.Invoke(messages);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-    }
-
-    public void Dispose()
-    {
-        _timer?.Dispose();
+        var messages = await _httpClient.GetFromJsonAsync<List<ChatMessageResponse>>($"api/chat?lastMessageDate={lastMessageDate}");
+        return messages!;
     }
 }

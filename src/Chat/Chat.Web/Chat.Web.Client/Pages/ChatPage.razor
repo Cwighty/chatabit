@@ -104,8 +104,7 @@
         typingTimer.AutoReset = false;
         typingTimer.Enabled = true;
 
-        mfer.OnMessagesUpdated += UpdateMessages;
-        mfer.StartFetchingMessages(TimeSpan.FromMilliseconds(options.PollingIntervalMilliseconds));
+        Messages = await mfer.FetchMessages();
 
         hubConnection = new HubConnectionBuilder()
         .WithUrl(Navigation.ToAbsoluteUri(HttpClient.BaseAddress + "api/chatHub"))
@@ -115,6 +114,18 @@
         {
             userTyping[user] = typing;
             InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On("NewMessage", async () =>
+        {
+            Console.WriteLine("New message received");
+            var latestMessage = Messages.FirstOrDefault();
+            if (latestMessage is not null)
+            {
+                var newMessages = await mfer.FetchMessages(latestMessage.CreatedAt);
+                Messages.AddRange(newMessages); 
+                await InvokeAsync(StateHasChanged);
+            } 
         });
 
         await hubConnection.StartAsync();
@@ -155,10 +166,11 @@
         };
 
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
-
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("NewMessage", username, true);
+        }
         isBusy = false;
-
-        await mfer.FetchMessages();
 
         message = "";
         uploadedImages.Clear();
@@ -198,8 +210,6 @@
     public async ValueTask DisposeAsync()
     {
         typingTimer?.Dispose();
-        mfer.OnMessagesUpdated -= UpdateMessages;
-        mfer.Dispose();
         if (hubConnection is not null)
         {
             await hubConnection.DisposeAsync();
