@@ -13,5 +13,9 @@ public partial class ChatMessage
 
     public string UserName { get; set; } = null!;
 
+    public int LamportClock { get; set; }
+
+    public string VectorClock { get; set; } = null!;
+
     public virtual ICollection<ChatMessageImage> ChatMessageImages { get; set; } = new List<ChatMessageImage>();
 }

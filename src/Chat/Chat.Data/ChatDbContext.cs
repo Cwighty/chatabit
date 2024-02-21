@@ -33,8 +33,12 @@ public partial class ChatDbContext : DbContext
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
+            entity.Property(e => e.LamportClock).HasColumnName("lamport_clock");
             entity.Property(e => e.MessageText).HasColumnName("message_text");
             entity.Property(e => e.UserName).HasColumnName("user_name");
+            entity.Property(e => e.VectorClock)
+                .HasColumnType("jsonb")
+                .HasColumnName("vector_clock");
         });
 
         modelBuilder.Entity<ChatMessageImage>(entity =>

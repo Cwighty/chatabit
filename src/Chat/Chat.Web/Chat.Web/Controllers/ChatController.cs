@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.Metrics;
+﻿using System.ComponentModel;
+using System.Diagnostics.Metrics;
+using System.Text.Json;
 using Chat.Data;
 using Chat.Data.Entities;
 using Chat.Data.Features.Chat;
@@ -71,12 +73,15 @@ public class ChatController : ControllerBase
             activity?.AddTag("images", request.Images.Count.ToString());
             try
             {
+                var vectorString =  JsonSerializer.Serialize(request.VectorClock);
                 var dbChatMessage = new ChatMessage()
                 {
                     Id = Guid.NewGuid(),
                     MessageText = request.MessageText,
                     UserName = request.UserName,
                     CreatedAt = DateTime.Now,
+                    LamportClock = request.LamportTimestamp,
+                    VectorClock = vectorString 
                 };
 
                 await _context.ChatMessages.AddAsync(dbChatMessage);

@@ -10,6 +10,7 @@
 @inject ChatOptions options
 @inject HttpClient HttpClient
 @inject MessageFetcher mfer;
+@inject LocalStorageAccessor localStorage;
 
 <div class="container">
     <div class="border border-1 p-1" style="display: flex; flex-direction: column-reverse; height: 500px; overflow: auto">
@@ -94,8 +95,27 @@
     private Dictionary<string, bool> userTyping = new Dictionary<string, bool>();
     private Timer? typingTimer;
 
+    private Guid clientId;
+
     protected override async Task OnInitializedAsync()
     {
+        clientId = default;
+        try
+        {
+            clientId = await localStorage.GetValueAsync<Guid>("clientId");
+        }
+        catch
+        {
+        }
+        Console.WriteLine($"Client ID: {clientId}");
+        if (clientId == default)
+        {
+            clientId = Guid.NewGuid();
+            await localStorage.SetValueAsync<Guid>("clientId", clientId);
+            await localStorage.SetValueAsync<int>("lamportClock", 0);
+            await localStorage.SetValueAsync<Dictionary<string, int>>("vectorClock", new Dictionary<string, int>());
+        }
+
         typingTimer = new Timer(1000);
         typingTimer.Elapsed += async (sender, e) =>
         {
@@ -105,6 +125,11 @@
         typingTimer.Enabled = true;
 
         Messages = await mfer.FetchMessages();
+        var latestMessage = Messages.FirstOrDefault();
+        if (latestMessage is not null)
+        {
+            await UpdateClocks(latestMessage);
+        }
 
         hubConnection = new HubConnectionBuilder()
         .WithUrl(Navigation.ToAbsoluteUri(HttpClient.BaseAddress + "api/chatHub"))
@@ -120,10 +145,13 @@
         {
             Console.WriteLine("New message received");
             var latestMessage = Messages.FirstOrDefault();
+
             if (latestMessage is not null)
             {
                 var newMessages = await mfer.FetchMessages(latestMessage.CreatedAt);
                 Messages.InsertRange(0, newMessages); 
+                latestMessage = Messages.FirstOrDefault();
+                await UpdateClocks(latestMessage);
                 await InvokeAsync(StateHasChanged);
             } 
         });
@@ -135,6 +163,20 @@
     {
         Messages = messages;
         StateHasChanged();
+    }
+
+    private async Task UpdateClocks(ChatMessageResponse latestMessage)
+    {
+        var latestLamport = Math.Max(latestMessage.LamportTimestamp, await localStorage.GetValueAsync<int>("lamportClock"));
+        await localStorage.SetValueAsync<int>("lamportClock", latestLamport + 1);
+
+        var latestVector = await localStorage.GetValueAsync<Dictionary<string, int>>("vectorClock");
+        foreach (var key in latestMessage.VectorClock.Keys)
+        {
+            latestVector[key] = Math.Max(latestVector.GetValueOrDefault(key, 0), latestMessage.VectorClock[key]);
+        }
+        latestVector = await IncrementVectorClock();
+        await localStorage.SetValueAsync<Dictionary<string, int>>("vectorClock", latestVector);
     }
 
     private async Task HandleSelectedFiles(InputFileChangeEventArgs e)
@@ -158,11 +200,16 @@
     private async Task SendMessage()
     {
         isBusy = true;
+        var currentLamport = await IncrementLamportClock();
+        var currentVectorClock = await IncrementVectorClock();
+
         var chatMessage = new NewChatMessageRequest()
         {
             MessageText = message,
             UserName = username,
-            Images = uploadedImages
+            Images = uploadedImages,
+            LamportTimestamp = currentLamport,
+            VectorClock = currentVectorClock,
         };
 
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
@@ -184,6 +231,20 @@
         }
     }
 
+    private async Task<int> IncrementLamportClock()
+    {
+        var lamportClock = await localStorage.GetValueAsync<int>("lamportClock");
+        await localStorage.SetValueAsync<int>("lamportClock", (lamportClock + 1));
+        return lamportClock + 1;
+    }
+
+    private async Task<Dictionary<string, int>> IncrementVectorClock()
+    {
+        var vectorClock = await localStorage.GetValueAsync<Dictionary<string, int>>("vectorClock");
+        vectorClock[clientId.ToString()] = vectorClock.GetValueOrDefault(clientId.ToString(), 0) + 1;
+        await localStorage.SetValueAsync<Dictionary<string, int>>("vectorClock", vectorClock);
+        return vectorClock;
+    }
     
     private async Task SendUserTypingMessage()
     {
