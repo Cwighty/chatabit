@@ -27,12 +27,16 @@
                     <div class="text-muted">@user.Key is typing...</div>
                 }
             }
-            @foreach (var m in Messages.OrderByDescending(m => m.CreatedAt))
+            @foreach (var m in SortMessages(Messages))
             {
                 <div class="card mb-3">
                     <div class="card-header">
                         @m.UserName
                         <small class="text-muted ml-2">@m.CreatedAt.ToString("g")</small>
+                        <div class="text-muted ml-2">
+                            <small >Lamport: @m.LamportTimestamp</small>
+                            <small >Vector: @string.Join(", ", m.VectorClock.Select(v => $"{v.Key}: {v.Value}"))</small>
+                        </div>
                     </div>
                     <div class="card-body">
                         @foreach (var img in m.Images)
@@ -166,6 +170,15 @@
         await hubConnection.StartAsync();
     }
 
+    private List<ChatMessageResponse> SortMessages(List<ChatMessageResponse> messages)
+    {
+        return messages
+            .OrderByDescending(m => m, new VectorClockComparer())
+            .OrderByDescending(m => m.LamportTimestamp)
+            .OrderByDescending(m => m.ClientId)
+            .ToList();
+    }
+
     private void UpdateMessages(List<ChatMessageResponse> messages)
     {
         Messages = messages;
@@ -177,14 +190,13 @@
         if (OperatingSystem.IsBrowser())
         {
             var latestLamport = Math.Max(latestMessage.LamportTimestamp, await localStorage.GetValueAsync<int>(LAMPORT_CLOCK));
-            await localStorage.SetValueAsync<int>(LAMPORT_CLOCK, latestLamport + 1);
+            await localStorage.SetValueAsync<int>(LAMPORT_CLOCK, latestLamport);
 
             var latestVector = await localStorage.GetValueAsync<Dictionary<string, int>>(VECTOR_CLOCK);
             foreach (var key in latestMessage.VectorClock.Keys)
             {
                 latestVector[key] = Math.Max(latestVector.GetValueOrDefault(key, 0), latestMessage.VectorClock[key]);
             }
-            latestVector = await IncrementVectorClock();
             await localStorage.SetValueAsync<Dictionary<string, int>>(VECTOR_CLOCK, latestVector);
         }
     }
