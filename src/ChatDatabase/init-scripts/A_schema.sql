@@ -6,6 +6,7 @@ create table chat_message (
     message_text text not null,
     created_at timestamp not null default now(),
     user_name text not null,
+    client_id uuid not null,
     lamport_clock integer not null,
     vector_clock jsonb not null
 );

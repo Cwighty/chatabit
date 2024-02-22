@@ -80,6 +80,7 @@ public class ChatController : ControllerBase
                     MessageText = request.MessageText,
                     UserName = request.UserName,
                     CreatedAt = DateTime.Now,
+                    ClientId = request.ClientId,
                     LamportClock = request.LamportTimestamp,
                     VectorClock = vectorString 
                 };

@@ -13,6 +13,8 @@ public partial class ChatMessage
 
     public string UserName { get; set; } = null!;
 
+    public Guid ClientId { get; set; }
+
     public int LamportClock { get; set; }
 
     public string VectorClock { get; set; } = null!;

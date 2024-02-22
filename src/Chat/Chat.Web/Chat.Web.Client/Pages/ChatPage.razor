@@ -27,7 +27,7 @@
                     <div class="text-muted">@user.Key is typing...</div>
                 }
             }
-            @foreach (var m in Messages)
+            @foreach (var m in Messages.OrderByDescending(m => m.CreatedAt))
             {
                 <div class="card mb-3">
                     <div class="card-header">
@@ -218,6 +218,7 @@
             MessageText = message,
             UserName = username,
             Images = uploadedImages,
+            ClientId = clientId,
             LamportTimestamp = currentLamport,
             VectorClock = currentVectorClock,
         };

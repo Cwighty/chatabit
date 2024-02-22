@@ -8,6 +8,8 @@ public class ChatMessageResponse
 
     public int LamportTimestamp { get; set; }
 
+    public Guid ClientId { get; set; }
+
     public Dictionary<string, int> VectorClock { get; set; } = new Dictionary<string, int>();
 
     public IEnumerable<string> Images { get; set; } = [];

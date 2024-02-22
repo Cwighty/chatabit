@@ -14,6 +14,7 @@ public static class ChatMessageExtensions
             MessageText = message.MessageText,
             Images = message.ChatMessageImages.Select(x => x.Id.ToString()).ToList(),
             CreatedAt = message.CreatedAt,
+
             VectorClock = a,
             LamportTimestamp = message.LamportClock,
         };
