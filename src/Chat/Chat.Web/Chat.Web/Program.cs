@@ -49,6 +49,8 @@ public class Program
             return hubConnection;
         });
 
+        builder.Services.AddScoped<LocalStorageAccessor>();
+
         builder.Services.AddControllers();
 
         builder.Services.AddSignalR();

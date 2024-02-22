@@ -97,23 +97,30 @@
 
     private Guid clientId;
 
+    private const string LAMPORT_CLOCK = "lamportClock";
+
+    private const string VECTOR_CLOCK = "vectorClock";
+
     protected override async Task OnInitializedAsync()
     {
-        clientId = default;
-        try
+        if (OperatingSystem.IsBrowser())
         {
-            clientId = await localStorage.GetValueAsync<Guid>("clientId");
-        }
-        catch
-        {
-        }
-        Console.WriteLine($"Client ID: {clientId}");
-        if (clientId == default)
-        {
-            clientId = Guid.NewGuid();
-            await localStorage.SetValueAsync<Guid>("clientId", clientId);
-            await localStorage.SetValueAsync<int>("lamportClock", 0);
-            await localStorage.SetValueAsync<Dictionary<string, int>>("vectorClock", new Dictionary<string, int>());
+            clientId = default;
+            try
+            {
+                clientId = await localStorage.GetValueAsync<Guid>(nameof(clientId));
+            }
+            catch
+            {
+            }
+            Console.WriteLine($"Client ID: {clientId}");
+            if (clientId == default)
+            {
+                clientId = Guid.NewGuid();
+                await localStorage.SetValueAsync<Guid>(nameof(clientId), clientId);
+                await localStorage.SetValueAsync<int>(LAMPORT_CLOCK, 0);
+                await localStorage.SetValueAsync<Dictionary<string, int>>(VECTOR_CLOCK, new Dictionary<string, int>());
+            }
         }
 
         typingTimer = new Timer(1000);
@@ -167,16 +174,19 @@
 
     private async Task UpdateClocks(ChatMessageResponse latestMessage)
     {
-        var latestLamport = Math.Max(latestMessage.LamportTimestamp, await localStorage.GetValueAsync<int>("lamportClock"));
-        await localStorage.SetValueAsync<int>("lamportClock", latestLamport + 1);
-
-        var latestVector = await localStorage.GetValueAsync<Dictionary<string, int>>("vectorClock");
-        foreach (var key in latestMessage.VectorClock.Keys)
+        if (OperatingSystem.IsBrowser())
         {
-            latestVector[key] = Math.Max(latestVector.GetValueOrDefault(key, 0), latestMessage.VectorClock[key]);
+            var latestLamport = Math.Max(latestMessage.LamportTimestamp, await localStorage.GetValueAsync<int>(LAMPORT_CLOCK));
+            await localStorage.SetValueAsync<int>(LAMPORT_CLOCK, latestLamport + 1);
+
+            var latestVector = await localStorage.GetValueAsync<Dictionary<string, int>>(VECTOR_CLOCK);
+            foreach (var key in latestMessage.VectorClock.Keys)
+            {
+                latestVector[key] = Math.Max(latestVector.GetValueOrDefault(key, 0), latestMessage.VectorClock[key]);
+            }
+            latestVector = await IncrementVectorClock();
+            await localStorage.SetValueAsync<Dictionary<string, int>>(VECTOR_CLOCK, latestVector);
         }
-        latestVector = await IncrementVectorClock();
-        await localStorage.SetValueAsync<Dictionary<string, int>>("vectorClock", latestVector);
     }
 
     private async Task HandleSelectedFiles(InputFileChangeEventArgs e)
@@ -233,17 +243,25 @@
 
     private async Task<int> IncrementLamportClock()
     {
-        var lamportClock = await localStorage.GetValueAsync<int>("lamportClock");
-        await localStorage.SetValueAsync<int>("lamportClock", (lamportClock + 1));
-        return lamportClock + 1;
+        if (OperatingSystem.IsBrowser())
+        {
+            var lamportClock = await localStorage.GetValueAsync<int>(LAMPORT_CLOCK);
+            await localStorage.SetValueAsync<int>(LAMPORT_CLOCK, (lamportClock + 1));
+            return lamportClock + 1;
+        }
+        return 0;
     }
 
     private async Task<Dictionary<string, int>> IncrementVectorClock()
     {
-        var vectorClock = await localStorage.GetValueAsync<Dictionary<string, int>>("vectorClock");
-        vectorClock[clientId.ToString()] = vectorClock.GetValueOrDefault(clientId.ToString(), 0) + 1;
-        await localStorage.SetValueAsync<Dictionary<string, int>>("vectorClock", vectorClock);
-        return vectorClock;
+        if (OperatingSystem.IsBrowser())
+        {
+            var vectorClock = await localStorage.GetValueAsync<Dictionary<string, int>>(VECTOR_CLOCK);
+            vectorClock[clientId.ToString()] = vectorClock.GetValueOrDefault(clientId.ToString(), 0) + 1;
+            await localStorage.SetValueAsync<Dictionary<string, int>>(VECTOR_CLOCK, vectorClock);
+            return vectorClock;
+        }
+        return new Dictionary<string, int>();
     }
     
     private async Task SendUserTypingMessage()

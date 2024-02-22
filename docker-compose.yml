@@ -72,9 +72,9 @@ services:
     build: ./src/Chat
     environment:
       - DOTNET_URLS=http://+:8080
-      - ApiBaseAddress=http://host.docker.internal:3001
+      - ApiBaseAddress=http://172.17.0.1:3001
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=chatdb;Username=admin;Password=chatpassword!;
-      - ChatApiOptions__ImageProcessingApiUrl=http://host.docker.internal:3001
+      - ChatApiOptions__ImageProcessingApiUrl=http://172.17.0.1:3001
       - ObservabilityOptions__CollectorUrl=http://collector:4317
     command: >
       /bin/bash
