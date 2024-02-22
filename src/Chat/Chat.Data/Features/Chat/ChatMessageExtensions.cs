@@ -7,7 +7,7 @@ public static class ChatMessageExtensions
 {
     public static ChatMessageResponse ToResponseModel(this ChatMessage message)
     {
-        var a = JsonSerializer.Deserialize<Dictionary<string,int>>(message.VectorClock);
+        var a = JsonSerializer.Deserialize<Dictionary<string, int>>(message.VectorClock);
         return new ChatMessageResponse
         {
             UserName = message.UserName,

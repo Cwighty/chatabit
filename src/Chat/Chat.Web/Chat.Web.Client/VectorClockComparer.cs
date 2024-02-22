@@ -1,4 +1,4 @@
-using Chat.Data.Features.Chat;
+﻿using Chat.Data.Features.Chat;
 
 namespace Chat.Web.Client;
 

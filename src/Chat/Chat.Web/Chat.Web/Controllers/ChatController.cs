@@ -73,7 +73,7 @@ public class ChatController : ControllerBase
             activity?.AddTag("images", request.Images.Count.ToString());
             try
             {
-                var vectorString =  JsonSerializer.Serialize(request.VectorClock);
+                var vectorString = JsonSerializer.Serialize(request.VectorClock);
                 var dbChatMessage = new ChatMessage()
                 {
                     Id = Guid.NewGuid(),
@@ -82,7 +82,7 @@ public class ChatController : ControllerBase
                     CreatedAt = DateTime.Now,
                     ClientId = request.ClientId,
                     LamportClock = request.LamportTimestamp,
-                    VectorClock = vectorString 
+                    VectorClock = vectorString
                 };
 
                 await _context.ChatMessages.AddAsync(dbChatMessage);
