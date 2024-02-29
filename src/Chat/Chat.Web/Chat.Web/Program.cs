@@ -110,7 +110,7 @@ public class Program
 
         app.MapRazorComponents<App>()
             .AddInteractiveWebAssemblyRenderMode()
-            .AddAdditionalAssemblies(typeof(Chat.Web.Client.Pages.Home).Assembly);
+            .AddAdditionalAssemblies(typeof(Chat.Web.Client.Pages.ChatPage).Assembly);
 
         app.MapHealthChecks("/health");
         app.MapControllers();
