@@ -33,10 +33,6 @@
                     <div class="card-header">
                         @m.UserName
                         <small class="text-muted ml-2">@m.CreatedAt.ToString("g")</small>
-                        <div class="text-muted ml-2">
-                            <small >Lamport: @m.LamportTimestamp</small>
-                            <small >Vector: @string.Join(", ", m.VectorClock.Select(v => $"{v.Key}: {v.Value}"))</small>
-                        </div>
                     </div>
                     <div class="card-body">
                         @foreach (var img in m.Images)
