@@ -12,8 +12,8 @@
 @inject MessageFetcher mfer;
 @inject LocalStorageAccessor localStorage;
 
-<div class="container">
-    <div class="border border-1 p-1" style="display: flex; flex-direction: column-reverse; height: 500px; overflow: auto">
+<div class="container p-2">
+    <div class="border border-1 p-2" style="display: flex; flex-direction: column-reverse; height: 500px; overflow-y: auto; overflow-x: none !important;">
         @if (Messages == null | isLoading)
         {
             <em>Loading...</em>
@@ -29,18 +29,44 @@
             }
             @foreach (var m in SortMessages(Messages))
             {
-                <div class="card mb-3">
-                    <div class="card-header">
-                        @m.UserName
-                        <small class="text-muted ml-2">@m.CreatedAt.ToString("g")</small>
+                <div class="row">
+
+                @if (m.UserName == username)
+                {
+                    <div class="col-12 col-lg-6 offset-lg-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                @m.UserName
+                                <small class="text-muted ml-2">@m.CreatedAt.ToString("g")</small>
+                            </div>
+                            <div class="card-body">
+                                @foreach (var img in m.Images)
+                                {
+                                    <img src="@($"{HttpClient.BaseAddress}api/Image/file/{img}")" style="max-width: 30%; height: auto;"/>
+                                }
+                                <p class="card-text">@m.MessageText</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        @foreach (var img in m.Images)
-                        {
-                            <img src="@($"{HttpClient.BaseAddress}api/Image/file/{img}")" style="max-width: 30%; height: auto;"/>
-                        }
-                        <p class="card-text">@m.MessageText</p>
+                }
+                else
+                {
+                    <div class="col-12 col-lg-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                @m.UserName
+                                <small class="text-muted ml-2">@m.CreatedAt.ToString("g")</small>
+                            </div>
+                            <div class="card-body">
+                                @foreach (var img in m.Images)
+                                {
+                                    <img src="@($"{HttpClient.BaseAddress}api/Image/file/{img}")" style="max-width: 30%; height: auto;"/>
+                                }
+                                <p class="card-text">@m.MessageText</p>
+                            </div>
+                        </div>
                     </div>
+                }
                 </div>
             }
         }
