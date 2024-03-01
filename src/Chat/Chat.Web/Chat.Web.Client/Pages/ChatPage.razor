@@ -1,4 +1,4 @@
-@page "/"
+@page "/chat"
 @rendermode @(new InteractiveWebAssemblyRenderMode(false))
 @implements IAsyncDisposable
 @using Chat.Web.Client.Options
@@ -13,7 +13,8 @@
 @inject LocalStorageAccessor localStorage;
 
 <div class="container p-2">
-    <div class="border border-1 p-2" style="display: flex; flex-direction: column-reverse; height: 500px; overflow-y: auto; overflow-x: none !important;">
+    <div class="border border-1 mb-3"
+        style="display: flex; flex-direction: column-reverse; height: 500px; overflow-y: auto;">
         @if (Messages == null | isLoading)
         {
             <em>Loading...</em>
@@ -30,52 +31,32 @@
             @for (var i = 0; i < SortedMessages.Count; i++)
             {
                 var m = SortedMessages[i];
-                if (i == 0 || m.UserName != SortedMessages[i - 1].UserName || m.CreatedAt.Subtract(SortedMessages[i - 1].CreatedAt).TotalMinutes > 5)
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="chatmessage mb-3 ms-2">
+                            @foreach (var img in m.Images)
+                            {
+                                <img src="@($"{HttpClient.BaseAddress}api/Image/file/{img}")"
+                                    style="max-width: 30%; height: auto;" />
+                            }
+                            <p class="card-text">@m.MessageText</p>
+                        </div>
+                    </div>
+                </div>
+
+                if (i == 0 || m.UserName != SortedMessages[i - 1].UserName || m.CreatedAt.Subtract(SortedMessages[i -
+                1].CreatedAt).TotalMinutes > 5)
                 {
                     <div class="row">
                         <div class="col-12">
-                            <div class="text-center">
-                                @m.UserName
+                            <div class="ms-2">
+                                <b>@m.UserName</b>
                                 <small class="text-muted">@m.CreatedAt.ToString("g")</small>
                             </div>
                         </div>
                     </div>
                 }
-            
-                <div class="row">
-                @if (m.UserName == username)
-                {
-                    <div class="col-12 col-lg-6 offset-lg-6">
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                @foreach (var img in m.Images)
-                                {
-                                    <img src="@($"{HttpClient.BaseAddress}api/Image/file/{img}")" style="max-width: 30%; height: auto;"/>
-                                }
-                                <p class="card-text">@m.MessageText</p>
-                            </div>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="col-12 col-lg-6">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                @m.UserName
-                                <small class="text-muted ml-2">@m.CreatedAt.ToString("g")</small>
-                            </div>
-                            <div class="card-body">
-                                @foreach (var img in m.Images)
-                                {
-                                    <img src="@($"{HttpClient.BaseAddress}api/Image/file/{img}")" style="max-width: 30%; height: auto;"/>
-                                }
-                                <p class="card-text">@m.MessageText</p>
-                            </div>
-                        </div>
-                    </div>
-                }
-                </div>
             }
         }
     </div>
@@ -86,24 +67,20 @@
     }
     else
     {
+        <div class="form-group">
+            <label>Username</label>
+            <InputText @bind-Value="username" class="form-control" />
+        </div>
         <div class="form-group mb-2">
             <label>Message</label>
-            <InputTextArea @bind-Value="message" disabled="@(String.IsNullOrEmpty(username))" @oninput="OnUserTyping" class="form-control"/>
+            <InputTextArea @bind-Value="message" disabled="@(String.IsNullOrEmpty(username))"
+                placeholder = "Type a message..."
+                @oninput="OnUserTyping" class="form-control" />
         </div>
-        <div class="row mb-2">
-            <div class="col-md-9">
-                <div class="form-group">
-                    <label>Username</label>
-                    <InputText @bind-Value="username" class="form-control"/>
-                </div>
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button @onclick="SendMessage" class="btn btn-primary w-100">Send</button>
-            </div>
-        </div>
+        <button class="btn btn-primary" @onclick="SendMessage" disabled="@(String.IsNullOrEmpty(username) || String.IsNullOrEmpty(message))">Send</button>
         <div class="form-group mb-2">
             <label>Upload Images</label>
-            <InputFile multiple accept=".jpeg,.jpg,.png" OnChange="HandleSelectedFiles" @key="inputFileId"/>
+            <InputFile multiple accept=".jpeg,.jpg,.png" OnChange="HandleSelectedFiles" @key="inputFileId" />
             <div class="flex-row">
                 @foreach (var img in uploadedImages)
                 {
@@ -192,11 +169,11 @@
             if (latestMessage is not null)
             {
                 var newMessages = await mfer.FetchMessages(latestMessage.CreatedAt);
-                Messages.InsertRange(0, newMessages); 
+                Messages.InsertRange(0, newMessages);
                 latestMessage = Messages.FirstOrDefault();
                 await UpdateClocks(latestMessage);
                 await InvokeAsync(StateHasChanged);
-            } 
+            }
         });
 
         await hubConnection.StartAsync();
@@ -205,10 +182,10 @@
     private List<ChatMessageResponse> SortMessages(List<ChatMessageResponse> messages)
     {
         return messages
-            .OrderByDescending(m => m, new VectorClockComparer())
-            .OrderByDescending(m => m.LamportTimestamp)
-            .OrderByDescending(m => m.ClientId)
-            .ToList();
+        .OrderByDescending(m => m, new VectorClockComparer())
+        .OrderByDescending(m => m.LamportTimestamp)
+        .OrderByDescending(m => m.ClientId)
+        .ToList();
     }
 
     private void UpdateMessages(List<ChatMessageResponse> messages)
@@ -250,7 +227,13 @@
         var base64String = Convert.ToBase64String(arrayBuffer);
         return base64String;
     }
-
+    private async Task CheckForEnterKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+           await SendMessage();
+        }
+    }
     private async Task SendMessage()
     {
         isBusy = true;
@@ -258,14 +241,14 @@
         var currentVectorClock = await IncrementVectorClock();
 
         var chatMessage = new NewChatMessageRequest()
-        {
-            MessageText = message,
-            UserName = username,
-            Images = uploadedImages,
-            ClientId = clientId,
-            LamportTimestamp = currentLamport,
-            VectorClock = currentVectorClock,
-        };
+            {
+                MessageText = message,
+                UserName = username,
+                Images = uploadedImages,
+                ClientId = clientId,
+                LamportTimestamp = currentLamport,
+                VectorClock = currentVectorClock,
+            };
 
         await HttpClient.PostAsJsonAsync("api/chat", chatMessage);
 
@@ -308,7 +291,7 @@
         }
         return new Dictionary<string, int>();
     }
-    
+
     private async Task SendUserTypingMessage()
     {
         if (hubConnection is not null)
@@ -326,7 +309,7 @@
     }
 
     public bool IsConnected =>
-        hubConnection?.State == HubConnectionState.Connected;
+    hubConnection?.State == HubConnectionState.Connected;
 
     public async ValueTask DisposeAsync()
     {
