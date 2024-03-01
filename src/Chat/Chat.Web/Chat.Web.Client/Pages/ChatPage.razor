@@ -208,6 +208,13 @@
                 await UpdateClocks(latestMessage);
                 await InvokeAsync(StateHasChanged);
             }
+            else if (Messages.Count == 0)
+            {
+                Messages = await mfer.FetchMessages();
+                latestMessage = Messages.FirstOrDefault();
+                await UpdateClocks(latestMessage);
+                await InvokeAsync(StateHasChanged);
+            }
         });
 
         await hubConnection.StartAsync();
