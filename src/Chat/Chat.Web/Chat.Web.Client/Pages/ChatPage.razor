@@ -27,18 +27,26 @@
                     <div class="text-muted">@user.Key is typing...</div>
                 }
             }
-            @foreach (var m in SortMessages(Messages))
+            @for (var i = 0; i < SortedMessages.Count; i++)
             {
+                var m = SortedMessages[i];
+                if (i == 0 || m.UserName != SortedMessages[i - 1].UserName || m.CreatedAt.Subtract(SortedMessages[i - 1].CreatedAt).TotalMinutes > 5)
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="text-center">
+                                @m.UserName
+                                <small class="text-muted">@m.CreatedAt.ToString("g")</small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            
                 <div class="row">
-
                 @if (m.UserName == username)
                 {
                     <div class="col-12 col-lg-6 offset-lg-6">
                         <div class="card mb-3">
-                            <div class="card-header">
-                                @m.UserName
-                                <small class="text-muted ml-2">@m.CreatedAt.ToString("g")</small>
-                            </div>
                             <div class="card-body">
                                 @foreach (var img in m.Images)
                                 {
@@ -126,6 +134,8 @@
     private const string LAMPORT_CLOCK = "lamportClock";
 
     private const string VECTOR_CLOCK = "vectorClock";
+
+    public List<ChatMessageResponse> SortedMessages => SortMessages(Messages);
 
     protected override async Task OnInitializedAsync()
     {
