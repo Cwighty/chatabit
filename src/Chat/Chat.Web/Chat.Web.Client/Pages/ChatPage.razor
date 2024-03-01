@@ -12,6 +12,7 @@
 @inject MessageFetcher mfer;
 @inject LocalStorageAccessor localStorage;
 
+<div class="container">
 <div class="d-flex flex-column justify-content-between p-2">
     <div class="mb-3 d-flex flex-column-reverse" style="max-height:70vh; overflow-y: auto;">
         @if (Messages == null | isLoading)
@@ -42,7 +43,7 @@
                                 }
                                 <p class="card-text">@m.MessageText</p>
                             </div>
-                                <div class="d-flex flex-row justify-content-between">
+                                <div class="d-flex flex-row justify-content-between flex-wrap">
                                 <small class="text-muted">
                                      @m.CreatedAt.ToString("t")
                                      &nbsp; | &nbsp;
@@ -109,7 +110,7 @@
                         style="max-width: 250px;" />
                 </div>
                 <div>
-                    <button class="btn btn-primary" @onclick="SendMessage"
+                    <button class="btn btn-primary" style="background-color: #0ea376; border: none;" @onclick="SendMessage"
                         disabled="@(String.IsNullOrEmpty(username) || String.IsNullOrEmpty(message))">Send</button>
                 </div>
             </div>
@@ -121,6 +122,7 @@
             </div>
         </div>
     }
+</div>
 </div>
 
 
