@@ -38,7 +38,7 @@
                                 @foreach (var img in m.Images)
                                 {
                                     <img src="@($"{HttpClient.BaseAddress}api/Image/file/{img}")"
-                                        style="max-width: 30%; height: auto;" />
+                                        style="width: 20%; height: auto;" />
                                 }
                                 <p class="card-text">@m.MessageText</p>
                             </div>
