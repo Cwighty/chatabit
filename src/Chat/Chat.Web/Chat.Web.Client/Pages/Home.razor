@@ -11,7 +11,6 @@
 
 @code {
     protected override void OnInitialized()
-
     {
         if (NavigationManager.Uri.Contains("localhost"))
         {
@@ -19,7 +18,7 @@
         }
         else
         {
-            NavigationManager.NavigateTo("/chat");
+            NavigationManager.NavigateTo("https://chatabit.duckdns.org:1234/chat");
         }
     }
 }
