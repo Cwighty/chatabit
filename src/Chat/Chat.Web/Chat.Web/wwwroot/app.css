@@ -1,6 +1,6 @@
 html,
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Roboto", sans-serif !important;
 }
 
 a,
@@ -60,4 +60,12 @@ h1:focus {
 
 .chatmessage:hover {
   background-color: #444444;
+}
+
+.chatmessage small {
+  display: none;
+}
+
+.chatmessage:hover small {
+  display: block;
 }

@@ -12,8 +12,8 @@
 @inject MessageFetcher mfer;
 @inject LocalStorageAccessor localStorage;
 
-<div class="container p-2">
-    <div class="mb-3" style="display: flex; flex-direction: column-reverse; height: 500px; overflow-y: auto;">
+<div class="d-flex flex-column justify-content-between p-2">
+    <div class="mb-3 d-flex flex-column-reverse" style="max-height:70vh; overflow-y: auto;">
         @if (Messages == null | isLoading)
         {
             <em>Loading...</em>
@@ -33,13 +33,26 @@
 
                 <div class="row w-100">
                     <div class="col-12">
-                        <div class="chatmessage ms-2">
-                            @foreach (var img in m.Images)
-                            {
-                                <img src="@($"{HttpClient.BaseAddress}api/Image/file/{img}")"
-                                    style="max-width: 30%; height: auto;" />
-                            }
-                            <p class="card-text">@m.MessageText</p>
+                        <div class="chatmessage ms-2 d-flex flex-row justify-content-between">
+                            <div>
+                                @foreach (var img in m.Images)
+                                {
+                                    <img src="@($"{HttpClient.BaseAddress}api/Image/file/{img}")"
+                                        style="max-width: 30%; height: auto;" />
+                                }
+                                <p class="card-text">@m.MessageText</p>
+                            </div>
+                                <div class="d-flex flex-row justify-content-between">
+                                <small class="text-muted">
+                                     @m.CreatedAt.ToString("t")
+                                     &nbsp; | &nbsp;
+                                </small>
+                                <small class="text-muted">LPT: 
+                                    @m.LamportTimestamp
+                                    &nbsp; | &nbsp;
+                                </small>
+                                <small class="text-muted">VEC: @string.Join(", ", m.VectorClock.Select(v => $"{v.Key}: {v.Value}"))</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -92,8 +105,8 @@
             </div>
             <div class="d-flex justify-content-between">
                 <div class="form-group mb-2">
-                    <label>Upload Images</label>
-                    <InputFile multiple accept=".jpeg,.jpg,.png" OnChange="HandleSelectedFiles" @key="inputFileId" />
+                    <InputFile multiple accept=".jpeg,.jpg,.png" OnChange="HandleSelectedFiles" @key="inputFileId"
+                        style="max-width: 250px;" />
                 </div>
                 <div>
                     <button class="btn btn-primary" @onclick="SendMessage"
