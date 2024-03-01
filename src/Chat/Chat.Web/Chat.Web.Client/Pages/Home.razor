@@ -1,0 +1,25 @@
+@page "/"
+
+@inject NavigationManager NavigationManager
+
+
+<div class="text-center">
+    <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+
+    {
+        if (NavigationManager.Uri.Contains("localhost"))
+        {
+            NavigationManager.NavigateTo("http://localhost:3001/chat");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/chat");
+        }
+    }
+}

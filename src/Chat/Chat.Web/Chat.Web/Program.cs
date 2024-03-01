@@ -108,6 +108,7 @@ public class Program
         app.UseStaticFiles();
         app.UseAntiforgery();
 
+
         app.MapRazorComponents<App>()
             .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(typeof(Chat.Web.Client.Pages.ChatPage).Assembly);
